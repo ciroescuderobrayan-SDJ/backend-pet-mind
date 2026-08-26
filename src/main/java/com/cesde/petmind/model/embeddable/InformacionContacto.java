@@ -18,7 +18,4 @@ public class InformacionContacto {
 
     @Column(name = "email_contacto", nullable = false, unique = true, length = 100)
     private String emailContacto;
-
-    @Column(name = "contrasena", length = 15)
-    private String contrasena;
 }
