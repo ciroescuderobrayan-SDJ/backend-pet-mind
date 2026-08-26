@@ -21,7 +21,7 @@ import com.cesde.petmind.model.enums.RolUsuario;
 
 @Entity
 @Table(name = "usuarios")
-public class Usuarios extends BaseEntity {
+public class Usuario extends BaseEntity {
 
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
