@@ -1,19 +1,26 @@
 package com.cesde.petmind.model.base;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
-@MappedSuperclass 
+@MappedSuperclass
 @Getter
 @Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 
 public abstract class BaseEntity {
 
-        @Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -25,6 +32,7 @@ public abstract class BaseEntity {
     @Column(name = "fecha_actualizacion")
     private LocalDateTime fechaActualizacion;
     
-    @Column(name = "estado_activo")
+    @Builder.Default
+    @Column(name = "estado_activo", nullable = false)
     private Boolean estadoActivo = true;
 }
