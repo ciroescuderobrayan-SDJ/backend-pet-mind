@@ -1,4 +1,4 @@
-package com.example.pet_mind.model.enums;
+package com.cesde.petmind.model.enums;
 
 public enum RolUsuario {
     ADOPTANTE,

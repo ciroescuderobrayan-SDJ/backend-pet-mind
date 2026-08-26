@@ -1,4 +1,4 @@
-package com.example.pet_mind.model.base;
+package com.cesde.petmind.model.base;
 
 import jakarta.persistence.*;
 import lombok.Getter;
