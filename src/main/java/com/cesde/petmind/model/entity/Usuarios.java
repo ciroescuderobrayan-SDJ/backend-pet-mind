@@ -29,6 +29,9 @@ public class Usuarios extends BaseEntity {
     @Column(name = "apellido", nullable = false, length = 100)
     private String apellido;
 
+    @Column(name = "contrasena", nullable = false, length = 100)
+    private String contrasena;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "rol", nullable = false)
     private RolUsuario rol;
