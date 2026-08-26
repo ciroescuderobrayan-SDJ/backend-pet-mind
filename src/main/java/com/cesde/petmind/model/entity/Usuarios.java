@@ -1,4 +1,4 @@
-package com.example.pet_mind.model.entity;
+package com.cesde.petmind.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,9 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import com.example.pet_mind.model.embeddable.Direccion;
-import com.example.pet_mind.model.embeddable.InformacionContacto;
-import com.example.pet_mind.model.enums.RolUsuario;
+import com.cesde.petmind.model.embeddable.Direccion;
+import com.cesde.petmind.model.embeddable.InformacionContacto;
+import com.cesde.petmind.model.enums.RolUsuario;
 
 @Getter
 @Setter

@@ -1,4 +1,4 @@
-package com.example.pet_mind.model.embeddable;
+package com.cesde.petmind.model.embeddable;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
