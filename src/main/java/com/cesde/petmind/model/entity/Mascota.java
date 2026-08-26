@@ -1,10 +1,13 @@
 package com.cesde.petmind.model.entity;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -63,4 +66,7 @@ public class Mascota extends BaseEntity {
 
     @Embedded
     private CualidadesFisicas cualidadesFisicas;
+
+    @ManyToMany(mappedBy = "mascotasFavoritas")
+    private List<Usuario> usuariosFavoritos;
 }

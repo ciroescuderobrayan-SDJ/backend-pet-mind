@@ -1,5 +1,7 @@
 package com.cesde.petmind.model.entity;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,4 +43,15 @@ public class Usuario extends BaseEntity {
 
     @Embedded
     private Direccion direccion;
+
+    @OneToMany(mappedBy = "usuario")
+    private List<SolicitudAdopcion> solicitudes;
+
+    @ManyToMany
+    @JoinTable(
+        name = "usuario_mascota_favorita",
+        joinColumns = @JoinColumn(name = "usuario_id"),
+        inverseJoinColumns = @JoinColumn(name = "mascota_id")
+    )
+    private List<Mascota> mascotasFavoritas;
 }
