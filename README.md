@@ -43,6 +43,26 @@ src/
 
 ![Diagrama de base de datos de PetMind](docs/diagrama-db-petmind.png)
 
+### Entidades y relaciones
+
+Todas las entidades heredan de `BaseEntity` (`@MappedSuperclass`): `id`, `fechaCreacion`, `fechaActualizacion`, `estadoActivo`.
+
+| Entidad | Tabla | Atributos propios | Embebidos |
+|---|---|---|---|
+| **Usuario** | `usuarios` | `nombre`, `apellido`, `contrasena`, `rol` (`RolUsuario`: ADOPTANTE, ADMIN, REFUGIO) | `Direccion` (calle, ciudad, país, código postal), `InformacionContacto` (teléfono principal/secundario, email único) |
+| **Mascota** | `mascotas` | `nombre`, `especie` (`Especie`), `raza`, `edadAproximada`, `tamano` (`TamanoMascota`), `sexo` (`SexoMascota`), `descripcion`, `estadoAdopcion` (`EstadoAdopcion`), `esterilizado` | `CualidadesFisicas` (peso, altura, color de pelaje, condiciones médicas, cuidados especiales) |
+| **SolicitudAdopcion** | `solicitudes_adopcion` | `fechaSolicitud`, `estado` (`EstadoSolicitud`: PENDIENTE, APROBADA, RECHAZADA) | — |
+| **FormularioAdopcion** | `formularios_adopcion` | `tieneOtraMascota`, `tipoVivienda`, `esPropietario`, `motivoAdopcion` | — |
+| **Donacion** | `donaciones` | `monto`, `fechaDonacion`, `metodoPago` (`MetodoPago`), `estado` (`EstadoDonacion`: PENDIENTE, COMPLETADA, RECHAZADA) | — |
+
+**Relaciones:**
+
+- `Usuario` **1 → N** `SolicitudAdopcion` — un usuario puede tener varias solicitudes de adopción.
+- `Usuario` **1 → N** `Donacion` — un usuario puede realizar varias donaciones.
+- `Mascota` **1 → N** `SolicitudAdopcion` — una mascota puede tener varias solicitudes asociadas.
+- `SolicitudAdopcion` **1 → 1** `FormularioAdopcion` — cada solicitud tiene a lo sumo un formulario asociado (FK `solicitud_id` única).
+- `Usuario` **N ↔ N** `Mascota` — mascotas favoritas de un usuario, mapeada mediante la tabla intermedia `usuario_mascota_favorita`.
+
 ##  Requisitos
 
 - Java 21 o superior
