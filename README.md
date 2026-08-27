@@ -12,9 +12,9 @@ PetMind es un proyecto desarrollado para centralizar y administrar la informaci�
 | Integrante | Responsabilidades |
 |---|---|
 | **Santiago Varela** | Configuración de la conexión del backend con la base de datos PostgreSQL en Neon. Elaboración y actualización de la documentación técnica en el README, incluyendo la incorporación del diagrama de base de datos. |
-
+|---|---|
 | **Brayan Ciro** | Creación de las entidades JPA a partir del diagrama de base de datos. Implementación de las relaciones entre entidades y vinculación de las clases enumeradas con dichas entidades. |
-
+|---|---|
 | **Emmanuel Gómez** | Diseño inicial de la base de datos y elaboración del diagrama. Desarrollo de la clase base o clase padre, las clases embebidas y las enumeraciones del proyecto. |
 
 ##  Tecnologías
