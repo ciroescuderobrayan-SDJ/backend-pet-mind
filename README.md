@@ -4,6 +4,27 @@ Backend de PetMind, una plataforma para conectar personas, mascotas y fundacione
 
 Este segundo entregable incorpora el modelo de datos v3 y las capas `Repository`, `Service` y `Controller` construidas con Spring Boot.
 
+## PetMind: los 3 repositorios
+
+PetMind se divide en tres proyectos. Este repositorio es el **centro del sistema**: es el único que conoce la base de datos y el único que decide las reglas de negocio.
+
+| Repositorio | Rol | Habla con |
+|---|---|---|
+| [frontend-petmind](https://github.com/ciroescuderobrayan-SDJ/frontend-petmind) | Interfaz (React + Vite). Muestra datos y captura formularios. | Backend, por HTTP/JSON |
+| **backend-pet-mind** (este) | API REST (Spring Boot). Reglas de negocio, validaciones, persistencia. | PostgreSQL (Neon) |
+| [petmind-analitica](https://github.com/ciroescuderobrayan-SDJ/petmind-analitica) | Extracción, limpieza y análisis de datos (Python + Pandas). | Backend, por HTTP/JSON (solo lectura) |
+
+```mermaid
+flowchart LR
+    U([Usuario]) --> F[Frontend<br/>React + Vite]
+    F -- "HTTP / JSON<br/>/api/*" --> B[Backend<br/>Spring Boot]
+    B -- JPA --> DB[(PostgreSQL<br/>Neon)]
+    A[Analítica<br/>Python + Pandas] -- "GET /api/*<br/>solo lectura" --> B
+    A --> R[Data/processed<br/>CSV y reportes]
+```
+
+**Regla de oro:** ni el frontend ni la analítica se conectan directo a la base de datos. Todo pasa por esta API, así las reglas de negocio viven en un solo lugar.
+
 ## Equipo y responsabilidades
 
 | Integrante | Responsabilidad principal |
@@ -220,6 +241,31 @@ JpaRepository<Entidad, Long>
 | PUT | `/api/archivos/{id}` | Actualiza un archivo. |
 | DELETE | `/api/archivos/{id}` | Realiza borrado lógico. |
 
+## Integración con el frontend y la analítica
+
+Estado al revisar los tres repositorios (octubre de 2026): **el backend todavía no está conectado con ninguno de los otros dos.** El frontend usa datos de prueba guardados en el navegador y la analítica lee una API de MockAPI. Para conectarlos, esto es lo que le falta a este repositorio, en orden de prioridad:
+
+| # | Pendiente | Por qué | Quién lo necesita |
+|---|---|---|---|
+| 1 | **Configurar CORS** para `http://localhost:5173` (y la URL del frontend desplegado) | Sin CORS, el navegador bloquea las peticiones del frontend. | Frontend |
+| 2 | **Endpoint de inicio de sesión** `POST /api/auth/login` | Hoy el frontend compara contraseñas en el navegador; esa validación debe hacerse aquí. | Frontend |
+| 3 | **Guardar contraseñas cifradas** (BCrypt) | Hoy se guardan en texto plano. | Todos |
+| 4 | **Controladores faltantes:** historias, reportes de animales, gastos de campaña, actualizaciones y asignación de reportes a fundaciones | Los servicios existen, pero no hay rutas HTTP. Las pantallas de Historias y Reportar los necesitan. | Frontend |
+| 5 | **Respuestas planas o DTOs para listados** (por ejemplo, `usuarioId` en vez del objeto `usuario` completo) | Facilita el consumo desde React y desde Pandas, y evita exponer datos de más. | Frontend y analítica |
+| 6 | **Paginación** en los listados (`Pageable`) | La analítica y los listados públicos pueden crecer. | Ambos |
+
+### Qué lógica debe vivir aquí y no en el frontend
+
+| Regla | Dónde está hoy | Dónde debe estar |
+|---|---|---|
+| Validar correo y contraseña al iniciar sesión | `frontend/src/context/AuthProvider.jsx` | `POST /api/auth/login` |
+| Sumar el monto de una donación al recaudo de la campaña | Contextos del frontend | `DonacionService` |
+| Cambiar el estado de una mascota cuando se aprueba una adopción | Contextos del frontend | `SolicitudAdopcionService` |
+| Asignar un reporte de animal a fundaciones cercanas | Contextos del frontend | `ReporteAnimalService` / `ReporteFundacionService` |
+| Conteos de mascotas y campañas por fundación | Calculados en el navegador | Consultas `count` en los repositorios |
+
+El frontend puede (y debe) **seguir validando formularios** para dar mensajes rápidos al usuario, pero la decisión final siempre la toma el backend.
+
 ## Requisitos
 
 - Java 21 o superior.
@@ -279,6 +325,8 @@ docs/postman/PetMind-Brayan.postman_collection.json
 - No compartir credenciales de Neon.
 - No incluir contraseñas ni tokens en commits.
 - La contraseña del usuario se recibe solo en solicitudes de entrada y no se devuelve en las respuestas.
+
+> **Atención:** `src/main/resources/application-local.properties` está versionado y contiene credenciales reales de Neon. Hay que **cambiar la contraseña de la base en Neon**, borrar ese archivo del repositorio y agregarlo al `.gitignore`. Borrarlo no basta, porque la contraseña sigue en el historial de Git.
 
 ---
 
