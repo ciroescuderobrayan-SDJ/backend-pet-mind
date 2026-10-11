@@ -13,4 +13,11 @@ public interface FavoritoRepository extends JpaRepository<Favorito, Long> {
 
     // Favoritos guardados por un usuario
     List<Favorito> findByUsuarioIdAndEstadoActivoTrue(Long usuarioId);
+
+    // Regla de favorito unico: un usuario guarda cada mascota, campana o fundacion una sola vez
+    boolean existsByUsuarioIdAndMascotaIdAndEstadoActivoTrue(Long usuarioId, Long mascotaId);
+
+    boolean existsByUsuarioIdAndCampanaIdAndEstadoActivoTrue(Long usuarioId, Long campanaId);
+
+    boolean existsByUsuarioIdAndFundacionIdAndEstadoActivoTrue(Long usuarioId, Long fundacionId);
 }

@@ -1,11 +1,12 @@
 package com.cesde.petmind.service.impl;
 
+import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Fundacion;
 import com.cesde.petmind.model.entity.ReporteAnimal;
@@ -32,11 +33,7 @@ public class ReporteFundacionServiceImpl implements ReporteFundacionService {
 
     @Override
     public ReporteFundacion obtenerPorId(Long id) {
-        ReporteFundacion reporteFundacion = reporteFundacionRepository.findById(id).orElse(null);
-
-        if (reporteFundacion == null || !reporteFundacion.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe un reporte de fundacion con id " + id);
-        }
+        ReporteFundacion reporteFundacion = buscarActivo(reporteFundacionRepository, id, "un reporte de fundacion");
 
         return reporteFundacion;
     }
@@ -86,19 +83,11 @@ public class ReporteFundacionServiceImpl implements ReporteFundacionService {
 
         Long reporteId = reporteFundacion.getReporte().getId();
 
-        ReporteAnimal reporte = reporteAnimalRepository.findById(reporteId).orElse(null);
-
-        if (reporte == null || !reporte.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe un reporte animal activo con id " + reporteId);
-        }
+        ReporteAnimal reporte = buscarActivo(reporteAnimalRepository, reporteId, "un reporte animal activo");
 
         Long fundacionId = reporteFundacion.getFundacion().getId();
 
-        Fundacion fundacion = fundacionRepository.findById(fundacionId).orElse(null);
-
-        if (fundacion == null || !fundacion.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe una fundacion activa con id " + fundacionId);
-        }
+        Fundacion fundacion = buscarActivo(fundacionRepository, fundacionId, "una fundacion activa");
 
         reporteFundacion.setReporte(reporte);
         reporteFundacion.setFundacion(fundacion);

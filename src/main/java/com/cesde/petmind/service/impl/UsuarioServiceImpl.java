@@ -1,12 +1,14 @@
 package com.cesde.petmind.service.impl;
 
+import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
+
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
 
 import com.cesde.petmind.exceptions.RecursoDuplicadoException;
-import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Fundacion;
 import com.cesde.petmind.model.entity.Usuario;
@@ -40,17 +42,14 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public Usuario obtenerPorId(Long id) {
-        Usuario usuario = usuarioRepository.findById(id).orElse(null);
-
         // Un usuario borrado logicamente se trata igual que uno que no existe
-        if (usuario == null || !usuario.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe un usuario con id " + id);
-        }
+        Usuario usuario = buscarActivo(usuarioRepository, id, "un usuario");
         return usuario;
     }
 
     @Override
     public Usuario crear(Usuario usuario) {
+        normalizarCorreo(usuario);
         validarContrasenaSegura(usuario);
         validarRolPermitido(usuario);
         validarCorreoUnico(usuario);
@@ -61,10 +60,16 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public Usuario actualizar(Long id, Usuario usuario) {
         Usuario existente = obtenerPorId(id);
+        normalizarCorreo(usuario);
+
+        // Por PUT nadie puede volverse ADMIN: antes bastaba enviar "rol": "ADMIN" para obtener el rol
+        if (usuario.getRol() == RolUsuario.ADMIN && existente.getRol() != RolUsuario.ADMIN) {
+            throw new ReglaDeNegocioException("No se puede asignar el rol ADMIN a un usuario");
+        }
 
         // La regla del correo solo se revisa si el correo cambio
         String correoActual = existente.getContacto().getEmailContacto();
-        if (usuario.getContacto() == null || !correoActual.equals(usuario.getContacto().getEmailContacto())) {
+        if (usuario.getContacto() == null || !correoActual.equalsIgnoreCase(usuario.getContacto().getEmailContacto())) {
             validarCorreoUnico(usuario);
         }
         validarFundacionDelRepresentante(usuario);
@@ -116,8 +121,17 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
 
         String correo = usuario.getContacto().getEmailContacto();
-        if (usuarioRepository.existsByContactoEmailContacto(correo)) {
+        if (usuarioRepository.existsByContactoEmailContactoIgnoreCase(correo)) {
             throw new RecursoDuplicadoException("Ya existe un usuario registrado con el correo " + correo);
+        }
+    }
+
+    // El correo se guarda sin espacios y en minusculas para que no existan dos cuentas
+    // con el mismo correo escrito distinto (ANA@correo.com y ana@correo.com)
+    private void normalizarCorreo(Usuario usuario) {
+        if (usuario.getContacto() != null && usuario.getContacto().getEmailContacto() != null) {
+            usuario.getContacto().setEmailContacto(
+                    usuario.getContacto().getEmailContacto().trim().toLowerCase(Locale.ROOT));
         }
     }
 
@@ -135,10 +149,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
 
         Long fundacionId = usuario.getFundacion().getId();
-        Fundacion fundacion = fundacionRepository.findById(fundacionId).orElse(null);
-        if (fundacion == null || !fundacion.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe una fundacion con id " + fundacionId);
-        }
+        Fundacion fundacion = buscarActivo(fundacionRepository, fundacionId, "una fundacion");
 
         if (fundacion.getEstadoVerificacion() != EstadoVerificacion.VERIFICADA) {
             throw new ReglaDeNegocioException("La fundacion " + fundacion.getNombre() + " aun no esta verificada");

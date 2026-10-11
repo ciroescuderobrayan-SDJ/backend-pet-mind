@@ -1,10 +1,11 @@
 package com.cesde.petmind.service.impl;
 
+import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
+
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Notificacion;
 import com.cesde.petmind.model.entity.Usuario;
@@ -29,12 +30,8 @@ public class NotificacionServiceImpl implements NotificacionService {
 
     @Override
     public Notificacion obtenerPorId(Long id) {
-        Notificacion notificacion = notificacionRepository.findById(id).orElse(null);
-
         // Una notificacion borrada logicamente se trata igual que una que no existe
-        if (notificacion == null || !notificacion.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe una notificacion con id " + id);
-        }
+        Notificacion notificacion = buscarActivo(notificacionRepository, id, "una notificacion");
         return notificacion;
     }
 
@@ -46,10 +43,7 @@ public class NotificacionServiceImpl implements NotificacionService {
 
         // En el JSON solo llega el id; aca se trae el usuario completo de la base
         Long usuarioId = notificacion.getUsuario().getId();
-        Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
-        if (usuario == null || !usuario.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe un usuario con id " + usuarioId);
-        }
+        Usuario usuario = buscarActivo(usuarioRepository, usuarioId, "un usuario");
         notificacion.setUsuario(usuario);
 
         return notificacionRepository.save(notificacion);

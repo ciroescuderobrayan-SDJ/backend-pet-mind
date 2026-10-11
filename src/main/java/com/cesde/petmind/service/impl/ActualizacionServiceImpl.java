@@ -1,11 +1,12 @@
 package com.cesde.petmind.service.impl;
 
+import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Actualizacion;
 import com.cesde.petmind.model.entity.CampanaDonacion;
@@ -32,11 +33,7 @@ public class ActualizacionServiceImpl implements ActualizacionService {
 
     @Override
     public Actualizacion obtenerPorId(Long id) {
-        Actualizacion actualizacion = actualizacionRepository.findById(id).orElse(null);
-
-        if (actualizacion == null || !actualizacion.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe una actualizacion con id " + id);
-        }
+        Actualizacion actualizacion = buscarActivo(actualizacionRepository, id, "una actualizacion");
 
         return actualizacion;
     }
@@ -96,13 +93,7 @@ public class ActualizacionServiceImpl implements ActualizacionService {
 
             Long campanaId = actualizacion.getCampana().getId();
 
-            CampanaDonacion campana = campanaDonacionRepository
-                    .findById(campanaId)
-                    .orElse(null);
-
-            if (campana == null || !campana.getEstadoActivo()) {
-                throw new RecursoNoEncontradoException("No existe una campana activa con id " + campanaId);
-            }
+            CampanaDonacion campana = buscarActivo(campanaDonacionRepository, campanaId, "una campana activa");
 
             actualizacion.setCampana(campana);
             actualizacion.setHistoria(null);
@@ -115,11 +106,7 @@ public class ActualizacionServiceImpl implements ActualizacionService {
 
             Long historiaId = actualizacion.getHistoria().getId();
 
-            Historia historia = historiaRepository.findById(historiaId).orElse(null);
-
-            if (historia == null || !historia.getEstadoActivo()) {
-                throw new RecursoNoEncontradoException("No existe una historia activa con id " + historiaId);
-            }
+            Historia historia = buscarActivo(historiaRepository, historiaId, "una historia activa");
 
             actualizacion.setHistoria(historia);
             actualizacion.setCampana(null);

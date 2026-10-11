@@ -1,12 +1,13 @@
 package com.cesde.petmind.service.impl;
 
+import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Mascota;
 import com.cesde.petmind.model.entity.SolicitudAdopcion;
@@ -36,11 +37,7 @@ public class SolicitudAdopcionServiceImpl implements SolicitudAdopcionService {
 
     @Override
     public SolicitudAdopcion obtenerPorId(Long id) {
-        SolicitudAdopcion solicitud = solicitudAdopcionRepository.findById(id).orElse(null);
-
-        if (solicitud == null || !solicitud.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe una solicitud de adopcion con id " + id);
-        }
+        SolicitudAdopcion solicitud = buscarActivo(solicitudAdopcionRepository, id, "una solicitud de adopcion");
 
         return solicitud;
     }
@@ -114,18 +111,10 @@ public class SolicitudAdopcionServiceImpl implements SolicitudAdopcionService {
         }
 
         Long usuarioId = solicitud.getUsuario().getId();
-        Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
-
-        if (usuario == null || !usuario.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe un usuario activo con id " + usuarioId);
-        }
+        Usuario usuario = buscarActivo(usuarioRepository, usuarioId, "un usuario activo");
 
         Long mascotaId = solicitud.getMascota().getId();
-        Mascota mascota = mascotaRepository.findById(mascotaId).orElse(null);
-
-        if (mascota == null || !mascota.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe una mascota activa con id " + mascotaId);
-        }
+        Mascota mascota = buscarActivo(mascotaRepository, mascotaId, "una mascota activa");
 
         if (mascota.getEstadoAdopcion() != EstadoAdopcion.DISPONIBLE) {
             throw new ReglaDeNegocioException("La mascota no esta disponible para adopcion");

@@ -1,11 +1,12 @@
 package com.cesde.petmind.service.impl;
 
+import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
+
 import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.CampanaDonacion;
 import com.cesde.petmind.model.entity.Donacion;
@@ -33,11 +34,7 @@ public class DonacionServiceImpl implements DonacionService {
 
     @Override
     public Donacion obtenerPorId(Long id) {
-        Donacion donacion = donacionRepository.findById(id).orElse(null);
-
-        if (donacion == null || !donacion.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe una donacion con id " + id);
-        }
+        Donacion donacion = buscarActivo(donacionRepository, id, "una donacion");
 
         return donacion;
     }
@@ -119,11 +116,7 @@ public class DonacionServiceImpl implements DonacionService {
         if (donacion.getUsuario() != null) {
             Long usuarioId = donacion.getUsuario().getId();
 
-            Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
-
-            if (usuario == null || !usuario.getEstadoActivo()) {
-                throw new RecursoNoEncontradoException("No existe un usuario activo con id " + usuarioId);
-            }
+            Usuario usuario = buscarActivo(usuarioRepository, usuarioId, "un usuario activo");
 
             donacion.setUsuario(usuario);
         }
@@ -131,11 +124,7 @@ public class DonacionServiceImpl implements DonacionService {
         if (donacion.getCampana() != null) {
             Long campanaId = donacion.getCampana().getId();
 
-            CampanaDonacion campana = campanaDonacionRepository.findById(campanaId).orElse(null);
-
-            if (campana == null || !campana.getEstadoActivo()) {
-                throw new RecursoNoEncontradoException("No existe una campana activa con id " + campanaId);
-            }
+            CampanaDonacion campana = buscarActivo(campanaDonacionRepository, campanaId, "una campana activa");
 
             donacion.setCampana(campana);
         }

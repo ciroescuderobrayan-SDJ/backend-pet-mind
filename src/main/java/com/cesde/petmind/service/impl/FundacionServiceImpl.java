@@ -1,10 +1,11 @@
 package com.cesde.petmind.service.impl;
 
+import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
+
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
 import com.cesde.petmind.model.entity.Fundacion;
 import com.cesde.petmind.repository.FundacionRepository;
 import com.cesde.petmind.service.FundacionService;
@@ -24,12 +25,8 @@ public class FundacionServiceImpl implements FundacionService {
 
     @Override
     public Fundacion obtenerPorId(Long id) {
-        Fundacion fundacion = fundacionRepository.findById(id).orElse(null);
-
         // Una fundacion borrada logicamente se trata igual que una que no existe
-        if (fundacion == null || !fundacion.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe una fundacion con id " + id);
-        }
+        Fundacion fundacion = buscarActivo(fundacionRepository, id, "una fundacion");
         return fundacion;
     }
 

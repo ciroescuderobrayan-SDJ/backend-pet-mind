@@ -1,11 +1,12 @@
 package com.cesde.petmind.service.impl;
 
+import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Fundacion;
 import com.cesde.petmind.model.entity.Mascota;
@@ -32,11 +33,7 @@ public class MascotaServiceImpl implements MascotaService {
 
     @Override
     public Mascota obtenerPorId(Long id) {
-        Mascota mascota = mascotaRepository.findById(id).orElse(null);
-
-        if (mascota == null || !mascota.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe una mascota con id " + id);
-        }
+        Mascota mascota = buscarActivo(mascotaRepository, id, "una mascota");
 
         return mascota;
     }
@@ -126,11 +123,7 @@ public class MascotaServiceImpl implements MascotaService {
 
         Long fundacionId = mascota.getFundacion().getId();
 
-        Fundacion fundacion = fundacionRepository.findById(fundacionId).orElse(null);
-
-        if (fundacion == null || !fundacion.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe una fundacion activa con id " + fundacionId);
-        }
+        Fundacion fundacion = buscarActivo(fundacionRepository, fundacionId, "una fundacion activa");
 
         mascota.setFundacion(fundacion);
     }

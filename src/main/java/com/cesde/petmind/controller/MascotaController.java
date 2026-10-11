@@ -60,7 +60,7 @@ public class MascotaController {
         );
     }
 
-@GetMapping("/por-fundacion")
+    @GetMapping("/por-fundacion")
     public ResponseEntity<List<Mascota>> listarPorFundacion(
             @RequestParam Long fundacionId
     ) {
