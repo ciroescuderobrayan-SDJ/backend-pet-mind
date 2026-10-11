@@ -1,11 +1,12 @@
 package com.cesde.petmind.service.impl;
 
+import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
+
 import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.CampanaDonacion;
 import com.cesde.petmind.model.entity.Fundacion;
@@ -42,11 +43,7 @@ public class CampanaDonacionServiceImpl implements CampanaDonacionService {
 
     @Override
     public CampanaDonacion obtenerPorId(Long id) {
-        CampanaDonacion campana = campanaDonacionRepository.findById(id).orElse(null);
-
-        if (campana == null || !campana.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe una campana con id " + id);
-        }
+        CampanaDonacion campana = buscarActivo(campanaDonacionRepository, id, "una campana");
 
         return campana;
     }
@@ -69,9 +66,11 @@ public class CampanaDonacionServiceImpl implements CampanaDonacionService {
             throw new ReglaDeNegocioException("La fundacion de una campana no puede cambiarse");
         }
 
-        if (campana.getMascota() != null) {
-            validarMascota(campana.getMascota(), existente.getFundacion());
-        }
+        // Se guarda la mascota completa traida de la base; antes se guardaba el objeto del JSON
+        // (solo con id) y la respuesta devolvia la mascota con nombre, especie, etc. en null.
+        Mascota mascota = campana.getMascota() == null
+                ? null
+                : validarMascota(campana.getMascota(), existente.getFundacion());
 
         existente.setTitulo(campana.getTitulo());
         existente.setDescripcion(campana.getDescripcion());
@@ -82,7 +81,7 @@ public class CampanaDonacionServiceImpl implements CampanaDonacionService {
         existente.setFechaFin(campana.getFechaFin());
         existente.setEstado(campana.getEstado());
         existente.setEsUrgente(campana.getEsUrgente());
-        existente.setMascota(campana.getMascota());
+        existente.setMascota(mascota);
 
         return campanaDonacionRepository.save(existente);
     }
@@ -126,39 +125,27 @@ public class CampanaDonacionServiceImpl implements CampanaDonacionService {
     private void resolverRelaciones(CampanaDonacion campana) {
         Long fundacionId = campana.getFundacion().getId();
 
-        Fundacion fundacion = fundacionRepository.findById(fundacionId).orElse(null);
-
-        if (fundacion == null || !fundacion.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe una fundacion activa con id " + fundacionId);
-        }
+        Fundacion fundacion = buscarActivo(fundacionRepository, fundacionId, "una fundacion activa");
 
         campana.setFundacion(fundacion);
 
         if (campana.getMascota() != null) {
-            validarMascota(campana.getMascota(), fundacion);
-
-            Mascota mascota = mascotaRepository
-                    .findById(campana.getMascota().getId())
-                    .orElse(null);
-
-            campana.setMascota(mascota);
+            campana.setMascota(validarMascota(campana.getMascota(), fundacion));
         }
     }
 
-    private void validarMascota(Mascota referencia, Fundacion fundacion) {
+    // Devuelve la mascota de la base si existe, esta activa y pertenece a la fundacion de la campana
+    private Mascota validarMascota(Mascota referencia, Fundacion fundacion) {
         if (referencia.getId() == null) {
             throw new ReglaDeNegocioException("La mascota asociada debe indicar un id");
         }
 
-        Mascota mascota = mascotaRepository.findById(referencia.getId()).orElse(null);
-
-        if (mascota == null || !mascota.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe una mascota activa con id " + referencia.getId());
-        }
+        Mascota mascota = buscarActivo(mascotaRepository, referencia.getId(), "una mascota activa");
 
         if (mascota.getFundacion() == null
                 || !mascota.getFundacion().getId().equals(fundacion.getId())) {
             throw new ReglaDeNegocioException("La mascota debe pertenecer a la fundacion de la campana");
         }
+        return mascota;
     }
 }

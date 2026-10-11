@@ -106,13 +106,34 @@ Todas las entidades heredan de `BaseEntity` y usan `estadoActivo`. Al eliminar u
 
 Las reglas de negocio se implementan en la capa de servicios. Algunos ejemplos son:
 
-- El correo de usuario es obligatorio y único.
+- El correo de usuario es obligatorio y único. Se guarda en minúsculas, así que `Ana@correo.com` y `ana@correo.com` son el mismo correo.
+- Nadie puede registrarse ni actualizarse a sí mismo con el rol `ADMIN`.
+- La contraseña tiene mínimo 8 caracteres, una mayúscula y un carácter especial.
 - Un representante debe pertenecer a una fundación verificada.
-- Un favorito debe apuntar a una sola mascota, campaña o fundación.
+- Un favorito debe apuntar a una sola mascota, campaña o fundación, y el mismo usuario no puede guardarlo dos veces.
 - Un archivo debe pertenecer a un único recurso.
 - Una mascota debe estar disponible antes de recibir una solicitud.
 - Una campaña debe tener una fundación activa y una meta de recaudo válida.
 - Una donación debe tener un monto mayor que cero y un método de pago válido.
+
+### Búsqueda de registros activos
+
+Todos los servicios buscan las relaciones con `BuscadorEntidades.buscarActivo(repositorio, id, "una mascota")`. Si el id viene vacío responde 400, y si el registro no existe o tiene borrado lógico responde 404.
+
+### Respuestas de error
+
+Todas las respuestas de error tienen la misma forma, sin detalles internos del servidor:
+
+```json
+{ "mensaje": "No existe una mascota con id 99" }
+```
+
+| Código | Cuándo |
+|---|---|
+| 400 | Regla de negocio, JSON mal escrito, valor de enum inexistente, parámetro faltante o campo obligatorio vacío |
+| 404 | El registro no existe o tiene borrado lógico |
+| 409 | Registro duplicado (correo, favorito, valor único) |
+| 500 | Error inesperado; el detalle queda solo en el log del servidor |
 
 ### Carga perezosa
 
@@ -295,6 +316,21 @@ sh mvnw spring-boot:run
 ```
 
 El servidor inicia en `http://localhost:8080`.
+
+## Pruebas automáticas
+
+```bash
+sh mvnw test
+```
+
+- `UsuarioServiceImplTest`, `FavoritoServiceImplTest` y `BuscadorEntidadesTest` son pruebas unitarias con Mockito: no necesitan base de datos.
+- `PetMindApplicationTests` levanta la aplicación completa, así que necesita el `.env` con una base disponible.
+
+Para correr solo las pruebas unitarias:
+
+```bash
+sh mvnw test -Dtest='*ServiceImplTest,BuscadorEntidadesTest'
+```
 
 ## Pruebas con Postman
 

@@ -1,11 +1,12 @@
 package com.cesde.petmind.service.impl;
 
+import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Fundacion;
 import com.cesde.petmind.model.entity.Historia;
@@ -32,11 +33,7 @@ public class HistoriaServiceImpl implements HistoriaService {
 
     @Override
     public Historia obtenerPorId(Long id) {
-        Historia historia = historiaRepository.findById(id).orElse(null);
-
-        if (historia == null || !historia.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe una historia con id " + id);
-        }
+        Historia historia = buscarActivo(historiaRepository, id, "una historia");
 
         return historia;
     }
@@ -84,11 +81,7 @@ public class HistoriaServiceImpl implements HistoriaService {
 
         Long fundacionId = historia.getFundacion().getId();
 
-        Fundacion fundacion = fundacionRepository.findById(fundacionId).orElse(null);
-
-        if (fundacion == null || !fundacion.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe una fundacion activa con id " + fundacionId);
-        }
+        Fundacion fundacion = buscarActivo(fundacionRepository, fundacionId, "una fundacion activa");
 
         historia.setFundacion(fundacion);
 
@@ -99,11 +92,7 @@ public class HistoriaServiceImpl implements HistoriaService {
 
             Long mascotaId = historia.getMascota().getId();
 
-            Mascota mascota = mascotaRepository.findById(mascotaId).orElse(null);
-
-            if (mascota == null || !mascota.getEstadoActivo()) {
-                throw new RecursoNoEncontradoException("No existe una mascota activa con id " + mascotaId);
-            }
+            Mascota mascota = buscarActivo(mascotaRepository, mascotaId, "una mascota activa");
 
             historia.setMascota(mascota);
         }

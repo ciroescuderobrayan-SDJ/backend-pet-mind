@@ -1,10 +1,11 @@
 package com.cesde.petmind.service.impl;
 
+import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
+
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
 import com.cesde.petmind.model.entity.GastoCampana;
 import com.cesde.petmind.repository.GastoCampanaRepository;
 import com.cesde.petmind.service.GastoCampanaService;
@@ -24,11 +25,7 @@ public class GastoCampanaServiceImpl implements GastoCampanaService {
 
     @Override
     public GastoCampana obtenerPorId(Long id) {
-        GastoCampana gasto = gastoCampanaRepository.findById(id).orElse(null);
-
-        if (gasto == null || !gasto.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe un gasto de campana con id " + id);
-        }
+        GastoCampana gasto = buscarActivo(gastoCampanaRepository, id, "un gasto de campana");
 
         return gasto;
     }

@@ -1,11 +1,12 @@
 package com.cesde.petmind.service.impl;
 
+import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
+
 import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
 import com.cesde.petmind.model.entity.ReporteAnimal;
 import com.cesde.petmind.repository.ReporteAnimalRepository;
 import com.cesde.petmind.service.ReporteAnimalService;
@@ -25,11 +26,7 @@ public class ReporteAnimalServiceImpl implements ReporteAnimalService {
 
     @Override
     public ReporteAnimal obtenerPorId(Long id) {
-        ReporteAnimal reporte = reporteAnimalRepository.findById(id).orElse(null);
-
-        if (reporte == null || !reporte.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe un reporte animal con id " + id);
-        }
+        ReporteAnimal reporte = buscarActivo(reporteAnimalRepository, id, "un reporte animal");
 
         return reporte;
     }

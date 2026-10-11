@@ -11,6 +11,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     // Borrado logico: los listados solo traen los registros activos
     List<Usuario> findByEstadoActivoTrue();
 
-    // Recorre el embebido contacto -> emailContacto. Lo usa la regla de correo unico
-    boolean existsByContactoEmailContacto(String emailContacto);
+    // Recorre el embebido contacto -> emailContacto. Lo usa la regla de correo unico.
+    // IgnoreCase: "Ana@correo.com" y "ana@correo.com" son el mismo correo.
+    boolean existsByContactoEmailContactoIgnoreCase(String emailContacto);
 }

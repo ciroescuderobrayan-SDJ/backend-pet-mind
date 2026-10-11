@@ -72,15 +72,18 @@ public class Usuario extends BaseEntity {
     @Column(name = "correo_verificado", nullable = false)
     private Boolean correoVerificado = false;
 
-    // Token de un solo uso para verificar correo o recuperar contrasena
+    // Token de un solo uso para verificar correo o recuperar contrasena.
+    // Ni el codigo ni su tipo ni su vencimiento se devuelven en el JSON: son datos internos.
     @JsonIgnore
     @Column(name = "token_codigo", length = 100)
     private String tokenCodigo;
 
+    @JsonIgnore
     @Enumerated(EnumType.STRING)
     @Column(name = "token_tipo")
     private TipoToken tokenTipo;
 
+    @JsonIgnore
     @Column(name = "token_expira")
     private LocalDateTime tokenExpira;
 }

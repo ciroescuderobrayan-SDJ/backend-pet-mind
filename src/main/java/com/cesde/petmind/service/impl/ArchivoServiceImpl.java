@@ -1,10 +1,11 @@
 package com.cesde.petmind.service.impl;
 
+import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
+
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Archivo;
 import com.cesde.petmind.model.entity.CampanaDonacion;
@@ -45,12 +46,8 @@ public class ArchivoServiceImpl implements ArchivoService {
 
     @Override
     public Archivo obtenerPorId(Long id) {
-        Archivo archivo = archivoRepository.findById(id).orElse(null);
-
         // Un archivo borrado logicamente se trata igual que uno que no existe
-        if (archivo == null || !archivo.getEstadoActivo()) {
-            throw new RecursoNoEncontradoException("No existe un archivo con id " + id);
-        }
+        Archivo archivo = buscarActivo(archivoRepository, id, "un archivo");
         return archivo;
     }
 
@@ -61,46 +58,31 @@ public class ArchivoServiceImpl implements ArchivoService {
         // En el JSON solo llega el id del dueno; aca se trae el registro completo de la base
         if (archivo.getMascota() != null) {
             Long mascotaId = archivo.getMascota().getId();
-            Mascota mascota = mascotaRepository.findById(mascotaId).orElse(null);
-            if (mascota == null || !mascota.getEstadoActivo()) {
-                throw new RecursoNoEncontradoException("No existe una mascota con id " + mascotaId);
-            }
+            Mascota mascota = buscarActivo(mascotaRepository, mascotaId, "una mascota");
             archivo.setMascota(mascota);
         }
 
         if (archivo.getSolicitud() != null) {
             Long solicitudId = archivo.getSolicitud().getId();
-            SolicitudAdopcion solicitud = solicitudAdopcionRepository.findById(solicitudId).orElse(null);
-            if (solicitud == null || !solicitud.getEstadoActivo()) {
-                throw new RecursoNoEncontradoException("No existe una solicitud con id " + solicitudId);
-            }
+            SolicitudAdopcion solicitud = buscarActivo(solicitudAdopcionRepository, solicitudId, "una solicitud");
             archivo.setSolicitud(solicitud);
         }
 
         if (archivo.getCampana() != null) {
             Long campanaId = archivo.getCampana().getId();
-            CampanaDonacion campana = campanaDonacionRepository.findById(campanaId).orElse(null);
-            if (campana == null || !campana.getEstadoActivo()) {
-                throw new RecursoNoEncontradoException("No existe una campana con id " + campanaId);
-            }
+            CampanaDonacion campana = buscarActivo(campanaDonacionRepository, campanaId, "una campana");
             archivo.setCampana(campana);
         }
 
         if (archivo.getHistoria() != null) {
             Long historiaId = archivo.getHistoria().getId();
-            Historia historia = historiaRepository.findById(historiaId).orElse(null);
-            if (historia == null || !historia.getEstadoActivo()) {
-                throw new RecursoNoEncontradoException("No existe una historia con id " + historiaId);
-            }
+            Historia historia = buscarActivo(historiaRepository, historiaId, "una historia");
             archivo.setHistoria(historia);
         }
 
         if (archivo.getReporte() != null) {
             Long reporteId = archivo.getReporte().getId();
-            ReporteAnimal reporte = reporteAnimalRepository.findById(reporteId).orElse(null);
-            if (reporte == null || !reporte.getEstadoActivo()) {
-                throw new RecursoNoEncontradoException("No existe un reporte con id " + reporteId);
-            }
+            ReporteAnimal reporte = buscarActivo(reporteAnimalRepository, reporteId, "un reporte");
             archivo.setReporte(reporte);
         }
 
