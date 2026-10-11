@@ -1,6 +1,7 @@
 package com.cesde.petmind.service.impl;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,13 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final UsuarioRepository usuarioRepository;
 
     private final FundacionRepository fundacionRepository;
+
+    // Regla de contrasena de PetMind: minimo 8 caracteres, una mayuscula y un caracter especial.
+    // Es la misma regla que valida el frontend en utils/password.js.
+    private static final int LONGITUD_MINIMA_CONTRASENA = 8;
+    private static final Pattern MAYUSCULA = Pattern.compile("[A-ZÁÉÍÓÚÜÑ]");
+    // Caracter especial: cualquier cosa que no sea letra, numero o espacio (!, @, #, $, ...)
+    private static final Pattern CARACTER_ESPECIAL = Pattern.compile("[^\\p{L}\\p{N}\\s]");
 
     @Override
     public List<Usuario> listar() {
@@ -81,11 +89,16 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuarioRepository.save(usuario);
     }
 
-    // Regla de negocio 1: la contrasena debe tener minimo 8 caracteres
+    // Regla de negocio 1: la contrasena debe tener minimo 8 caracteres, una mayuscula y un caracter especial
     private void validarContrasenaSegura(Usuario usuario) {
         String contrasena = usuario.getContrasena();
-        if (contrasena == null || contrasena.length() < 8) {
-            throw new ReglaDeNegocioException("La contrasena debe tener minimo 8 caracteres");
+        boolean valida = contrasena != null
+                && contrasena.length() >= LONGITUD_MINIMA_CONTRASENA
+                && MAYUSCULA.matcher(contrasena).find()
+                && CARACTER_ESPECIAL.matcher(contrasena).find();
+        if (!valida) {
+            throw new ReglaDeNegocioException(
+                    "La contrasena debe tener minimo 8 caracteres, una mayuscula y un caracter especial");
         }
     }
 

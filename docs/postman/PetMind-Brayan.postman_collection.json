@@ -174,7 +174,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Brayan\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"clave123\",\n  \"rol\": \"ADOPTANTE\",\n  \"contacto\": {\n    \"emailContacto\": \"brayan{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  }\n}"
+              "raw": "{\n  \"nombre\": \"Brayan\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"Clave#2026\",\n  \"rol\": \"ADOPTANTE\",\n  \"contacto\": {\n    \"emailContacto\": \"brayan{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  }\n}"
             }
           }
         },
@@ -211,7 +211,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Otro\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"clave123\",\n  \"rol\": \"ADOPTANTE\",\n  \"contacto\": {\n    \"emailContacto\": \"brayan{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  }\n}"
+              "raw": "{\n  \"nombre\": \"Otro\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"Clave#2026\",\n  \"rol\": \"ADOPTANTE\",\n  \"contacto\": {\n    \"emailContacto\": \"brayan{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  }\n}"
             }
           }
         },
@@ -248,7 +248,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Sin Correo\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"clave123\",\n  \"rol\": \"ADOPTANTE\"\n}"
+              "raw": "{\n  \"nombre\": \"Sin Correo\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"Clave#2026\",\n  \"rol\": \"ADOPTANTE\"\n}"
             }
           }
         }
@@ -291,7 +291,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Representante\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"clave123\",\n  \"rol\": \"REPRESENTANTE_FUNDACION\",\n  \"contacto\": {\n    \"emailContacto\": \"rep{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  },\n  \"fundacion\": {\n    \"id\": {{fundacionVerificadaId}}\n  }\n}"
+              "raw": "{\n  \"nombre\": \"Representante\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"Clave#2026\",\n  \"rol\": \"REPRESENTANTE_FUNDACION\",\n  \"contacto\": {\n    \"emailContacto\": \"rep{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  },\n  \"fundacion\": {\n    \"id\": {{fundacionVerificadaId}}\n  }\n}"
             }
           }
         },
@@ -328,7 +328,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Sin Fundacion\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"clave123\",\n  \"rol\": \"REPRESENTANTE_FUNDACION\",\n  \"contacto\": {\n    \"emailContacto\": \"rep0{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  }\n}"
+              "raw": "{\n  \"nombre\": \"Sin Fundacion\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"Clave#2026\",\n  \"rol\": \"REPRESENTANTE_FUNDACION\",\n  \"contacto\": {\n    \"emailContacto\": \"rep0{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  }\n}"
             }
           }
         },
@@ -365,7 +365,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Pendiente\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"clave123\",\n  \"rol\": \"REPRESENTANTE_FUNDACION\",\n  \"contacto\": {\n    \"emailContacto\": \"rep1{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  },\n  \"fundacion\": {\n    \"id\": {{fundacionPendienteId}}\n  }\n}"
+              "raw": "{\n  \"nombre\": \"Pendiente\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"Clave#2026\",\n  \"rol\": \"REPRESENTANTE_FUNDACION\",\n  \"contacto\": {\n    \"emailContacto\": \"rep1{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  },\n  \"fundacion\": {\n    \"id\": {{fundacionPendienteId}}\n  }\n}"
             }
           }
         },
@@ -402,7 +402,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"No Existe\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"clave123\",\n  \"rol\": \"REPRESENTANTE_FUNDACION\",\n  \"contacto\": {\n    \"emailContacto\": \"rep2{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  },\n  \"fundacion\": {\n    \"id\": 999999\n  }\n}"
+              "raw": "{\n  \"nombre\": \"No Existe\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"Clave#2026\",\n  \"rol\": \"REPRESENTANTE_FUNDACION\",\n  \"contacto\": {\n    \"emailContacto\": \"rep2{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  },\n  \"fundacion\": {\n    \"id\": 999999\n  }\n}"
             }
           }
         }
@@ -731,7 +731,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Brayan Editado\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"clave123\",\n  \"rol\": \"ADOPTANTE\",\n  \"contacto\": {\n    \"emailContacto\": \"brayan{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  }\n}"
+              "raw": "{\n  \"nombre\": \"Brayan Editado\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"Clave#2026\",\n  \"rol\": \"ADOPTANTE\",\n  \"contacto\": {\n    \"emailContacto\": \"brayan{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  }\n}"
             }
           }
         },

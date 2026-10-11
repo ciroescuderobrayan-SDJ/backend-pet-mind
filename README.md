@@ -107,6 +107,7 @@ Todas las entidades heredan de `BaseEntity` y usan `estadoActivo`. Al eliminar u
 Las reglas de negocio se implementan en la capa de servicios. Algunos ejemplos son:
 
 - El correo de usuario es obligatorio y único.
+- La contraseña tiene mínimo 8 caracteres, una mayúscula y un carácter especial.
 - Un representante debe pertenecer a una fundación verificada.
 - Un favorito debe apuntar a una sola mascota, campaña o fundación.
 - Un archivo debe pertenecer a un único recurso.
