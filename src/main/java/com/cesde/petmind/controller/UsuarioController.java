@@ -16,14 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cesde.petmind.model.entity.Usuario;
 import com.cesde.petmind.service.UsuarioService;
 
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/usuarios")
-@RequiredArgsConstructor
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
 
     @GetMapping
     public ResponseEntity<List<Usuario>> listar() {

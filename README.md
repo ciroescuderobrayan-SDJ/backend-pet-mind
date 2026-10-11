@@ -317,6 +317,8 @@ sh mvnw spring-boot:run
 
 El servidor inicia en `http://localhost:8080`.
 
+La documentación interactiva de la API (Swagger UI) queda en `http://localhost:8080/swagger-ui.html` y el contrato OpenAPI en `http://localhost:8080/v3/api-docs`.
+
 ## Pruebas automáticas
 
 ```bash
