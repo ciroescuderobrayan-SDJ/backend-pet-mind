@@ -35,5 +35,8 @@ build/
 ### Variables de entorno ###
 .env
 
+### Configuración local con credenciales ###
+application-local.properties
+
 .DS_Store
 docs/.DS_Store

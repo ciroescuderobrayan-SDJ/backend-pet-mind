@@ -326,7 +326,9 @@ docs/postman/PetMind-Brayan.postman_collection.json
 - No incluir contraseñas ni tokens en commits.
 - La contraseña del usuario se recibe solo en solicitudes de entrada y no se devuelve en las respuestas.
 
-> **Atención:** `src/main/resources/application-local.properties` está versionado y contiene credenciales reales de Neon. Hay que **cambiar la contraseña de la base en Neon**, borrar ese archivo del repositorio y agregarlo al `.gitignore`. Borrarlo no basta, porque la contraseña sigue en el historial de Git.
+- Las credenciales van solo en `.env`. `application-local.properties` está en el `.gitignore` para que nadie lo vuelva a subir.
+
+> **Atención:** hasta octubre de 2026, `src/main/resources/application-local.properties` estuvo en el repositorio con credenciales reales de Neon. El archivo ya se quitó, pero la contraseña sigue en el historial de Git, así que hay que **cambiarla en el panel de Neon** y actualizar el `.env` de cada integrante.
 
 ---
 
