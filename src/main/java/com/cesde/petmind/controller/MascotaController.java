@@ -1,7 +1,10 @@
 package com.cesde.petmind.controller;
 
-import java.util.List;
+// Lombok deshabilitado temporalmente; implementacion manual abajo.
+// import lombok.RequiredArgsConstructor;
+// @RequiredArgsConstructor
 
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,21 +16,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.cesde.petmind.model.entity.Mascota;
 import com.cesde.petmind.model.enums.Especie;
 import com.cesde.petmind.model.enums.EstadoAdopcion;
 import com.cesde.petmind.model.enums.EstadoPublicacion;
 import com.cesde.petmind.service.MascotaService;
 
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/mascotas")
-@RequiredArgsConstructor
-
 public class MascotaController {
-
     private final MascotaService mascotaService;
 
     @GetMapping
@@ -41,44 +38,27 @@ public class MascotaController {
     }
 
     @GetMapping("/por-estado")
-    public ResponseEntity<List<Mascota>> listarPorEstado(
-            @RequestParam EstadoPublicacion estadoPublicacion,
-            @RequestParam EstadoAdopcion estadoAdopcion
-    ) {
-        return ResponseEntity.ok(
-                mascotaService.listarPorEstado(estadoPublicacion, estadoAdopcion)
-        );
+    public ResponseEntity<List<Mascota>> listarPorEstado(@RequestParam EstadoPublicacion estadoPublicacion, @RequestParam EstadoAdopcion estadoAdopcion) {
+        return ResponseEntity.ok(mascotaService.listarPorEstado(estadoPublicacion, estadoAdopcion));
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<List<Mascota>> buscarPorEspecieYCiudad(
-            @RequestParam Especie especie,
-            @RequestParam String ciudad
-    ) {
-        return ResponseEntity.ok(
-                mascotaService.buscarPorEspecieYCiudad(especie, ciudad)
-        );
+    public ResponseEntity<List<Mascota>> buscarPorEspecieYCiudad(@RequestParam Especie especie, @RequestParam String ciudad) {
+        return ResponseEntity.ok(mascotaService.buscarPorEspecieYCiudad(especie, ciudad));
     }
 
     @GetMapping("/por-fundacion")
-    public ResponseEntity<List<Mascota>> listarPorFundacion(
-            @RequestParam Long fundacionId
-    ) {
+    public ResponseEntity<List<Mascota>> listarPorFundacion(@RequestParam Long fundacionId) {
         return ResponseEntity.ok(mascotaService.listarPorFundacion(fundacionId));
     }
 
     @PostMapping
     public ResponseEntity<Mascota> crear(@RequestBody Mascota mascota) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(mascotaService.crear(mascota));
+        return ResponseEntity.status(HttpStatus.CREATED).body(mascotaService.crear(mascota));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Mascota> actualizar(
-            @PathVariable Long id,
-            @RequestBody Mascota mascota
-    ) {
+    public ResponseEntity<Mascota> actualizar(@PathVariable Long id, @RequestBody Mascota mascota) {
         return ResponseEntity.ok(mascotaService.actualizar(id, mascota));
     }
 
@@ -86,5 +66,8 @@ public class MascotaController {
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         mascotaService.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+    public MascotaController(final MascotaService mascotaService) {
+        this.mascotaService = mascotaService;
     }
 }

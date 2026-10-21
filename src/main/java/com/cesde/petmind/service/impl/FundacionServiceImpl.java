@@ -1,21 +1,18 @@
 package com.cesde.petmind.service.impl;
 
+// Lombok deshabilitado temporalmente; implementacion manual abajo.
+// import lombok.RequiredArgsConstructor;
+// @RequiredArgsConstructor
+
 import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
-
 import java.util.List;
-
 import org.springframework.stereotype.Service;
-
 import com.cesde.petmind.model.entity.Fundacion;
 import com.cesde.petmind.repository.FundacionRepository;
 import com.cesde.petmind.service.FundacionService;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 public class FundacionServiceImpl implements FundacionService {
-
     private final FundacionRepository fundacionRepository;
 
     @Override
@@ -38,7 +35,6 @@ public class FundacionServiceImpl implements FundacionService {
     @Override
     public Fundacion actualizar(Long id, Fundacion fundacion) {
         Fundacion existente = obtenerPorId(id);
-
         existente.setNombre(fundacion.getNombre());
         existente.setNit(fundacion.getNit());
         existente.setRepresentanteLegal(fundacion.getRepresentanteLegal());
@@ -59,9 +55,11 @@ public class FundacionServiceImpl implements FundacionService {
     @Override
     public void eliminar(Long id) {
         Fundacion fundacion = obtenerPorId(id);
-
         // Borrado logico: no se borra la fila, solo se desactiva
         fundacion.setEstadoActivo(false);
         fundacionRepository.save(fundacion);
+    }
+    public FundacionServiceImpl(final FundacionRepository fundacionRepository) {
+        this.fundacionRepository = fundacionRepository;
     }
 }

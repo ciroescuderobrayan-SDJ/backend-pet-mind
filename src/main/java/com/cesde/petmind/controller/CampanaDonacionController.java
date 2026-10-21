@@ -1,7 +1,10 @@
 package com.cesde.petmind.controller;
 
-import java.util.List;
+// Lombok deshabilitado temporalmente; implementacion manual abajo.
+// import lombok.RequiredArgsConstructor;
+// @RequiredArgsConstructor
 
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,18 +16,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.cesde.petmind.model.entity.CampanaDonacion;
 import com.cesde.petmind.model.enums.EstadoCampana;
 import com.cesde.petmind.service.CampanaDonacionService;
 
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/campanas-donacion")
-@RequiredArgsConstructor
 public class CampanaDonacionController {
-
     private final CampanaDonacionService campanaDonacionService;
 
     @GetMapping
@@ -34,8 +32,7 @@ public class CampanaDonacionController {
 
     // Ejemplo: GET /api/campanas-donacion/por-estado?estado=ACTIVA
     @GetMapping("/por-estado")
-    public ResponseEntity<List<CampanaDonacion>> listarPorEstado(
-            @RequestParam EstadoCampana estado) {
+    public ResponseEntity<List<CampanaDonacion>> listarPorEstado(@RequestParam EstadoCampana estado) {
         return ResponseEntity.ok(campanaDonacionService.listarPorEstado(estado));
     }
 
@@ -45,16 +42,12 @@ public class CampanaDonacionController {
     }
 
     @PostMapping
-    public ResponseEntity<CampanaDonacion> crear(
-            @RequestBody CampanaDonacion campana) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(campanaDonacionService.crear(campana));
+    public ResponseEntity<CampanaDonacion> crear(@RequestBody CampanaDonacion campana) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(campanaDonacionService.crear(campana));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CampanaDonacion> actualizar(
-            @PathVariable Long id,
-            @RequestBody CampanaDonacion campana) {
+    public ResponseEntity<CampanaDonacion> actualizar(@PathVariable Long id, @RequestBody CampanaDonacion campana) {
         return ResponseEntity.ok(campanaDonacionService.actualizar(id, campana));
     }
 
@@ -62,5 +55,8 @@ public class CampanaDonacionController {
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         campanaDonacionService.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+    public CampanaDonacionController(final CampanaDonacionService campanaDonacionService) {
+        this.campanaDonacionService = campanaDonacionService;
     }
 }
