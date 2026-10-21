@@ -1,7 +1,10 @@
 package com.cesde.petmind.controller;
 
-import java.util.List;
+// Lombok deshabilitado temporalmente; implementacion manual abajo.
+// import lombok.RequiredArgsConstructor;
+// @RequiredArgsConstructor
 
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,18 +16,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.cesde.petmind.model.entity.Donacion;
 import com.cesde.petmind.model.enums.EstadoDonacion;
 import com.cesde.petmind.service.DonacionService;
 
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/donaciones")
-@RequiredArgsConstructor
 public class DonacionController {
-
     private final DonacionService donacionService;
 
     @GetMapping
@@ -45,9 +43,7 @@ public class DonacionController {
 
     // Ejemplo: GET /api/donaciones/por-campana?campanaId=1&estado=COMPLETADA
     @GetMapping("/por-campana")
-    public ResponseEntity<List<Donacion>> listarPorCampanaYEstado(
-            @RequestParam Long campanaId,
-            @RequestParam EstadoDonacion estado) {
+    public ResponseEntity<List<Donacion>> listarPorCampanaYEstado(@RequestParam Long campanaId, @RequestParam EstadoDonacion estado) {
         return ResponseEntity.ok(donacionService.listarPorCampanaYEstado(campanaId, estado));
     }
 
@@ -57,9 +53,7 @@ public class DonacionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Donacion> actualizar(
-            @PathVariable Long id,
-            @RequestBody Donacion donacion) {
+    public ResponseEntity<Donacion> actualizar(@PathVariable Long id, @RequestBody Donacion donacion) {
         return ResponseEntity.ok(donacionService.actualizar(id, donacion));
     }
 
@@ -67,5 +61,8 @@ public class DonacionController {
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         donacionService.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+    public DonacionController(final DonacionService donacionService) {
+        this.donacionService = donacionService;
     }
 }
