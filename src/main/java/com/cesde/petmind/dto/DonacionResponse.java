@@ -16,10 +16,6 @@ import com.cesde.petmind.model.enums.MetodoPago;
 // @AllArgsConstructor
 public class DonacionResponse {
 
-    private Long id;
-    private Long campanaId;
-    private Long usuarioId;
-    private Long donacionOrigenId;
     private BigDecimal monto;
     private BigDecimal valorComision;
     private BigDecimal montoTotal;
@@ -44,10 +40,6 @@ public class DonacionResponse {
     private LocalDateTime fechaActualizacion;
 
     public DonacionResponse(
-            Long id,
-            Long campanaId,
-            Long usuarioId,
-            Long donacionOrigenId,
             BigDecimal monto,
             BigDecimal valorComision,
             BigDecimal montoTotal,
@@ -70,10 +62,6 @@ public class DonacionResponse {
             Boolean estadoActivo,
             LocalDateTime fechaCreacion,
             LocalDateTime fechaActualizacion) {
-        this.id = id;
-        this.campanaId = campanaId;
-        this.usuarioId = usuarioId;
-        this.donacionOrigenId = donacionOrigenId;
         this.monto = monto;
         this.valorComision = valorComision;
         this.montoTotal = montoTotal;
@@ -96,22 +84,6 @@ public class DonacionResponse {
         this.estadoActivo = estadoActivo;
         this.fechaCreacion = fechaCreacion;
         this.fechaActualizacion = fechaActualizacion;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getCampanaId() {
-        return campanaId;
-    }
-
-    public Long getUsuarioId() {
-        return usuarioId;
-    }
-
-    public Long getDonacionOrigenId() {
-        return donacionOrigenId;
     }
 
     public BigDecimal getMonto() {

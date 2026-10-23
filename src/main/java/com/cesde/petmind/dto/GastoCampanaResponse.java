@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 // @AllArgsConstructor
 public class GastoCampanaResponse {
 
-    private Long id;
-    private Long campanaId;
     private String concepto;
     private BigDecimal monto;
     private Integer orden;
@@ -20,30 +18,18 @@ public class GastoCampanaResponse {
     private LocalDateTime fechaActualizacion;
 
     public GastoCampanaResponse(
-            Long id,
-            Long campanaId,
             String concepto,
             BigDecimal monto,
             Integer orden,
             Boolean estadoActivo,
             LocalDateTime fechaCreacion,
             LocalDateTime fechaActualizacion) {
-        this.id = id;
-        this.campanaId = campanaId;
         this.concepto = concepto;
         this.monto = monto;
         this.orden = orden;
         this.estadoActivo = estadoActivo;
         this.fechaCreacion = fechaCreacion;
         this.fechaActualizacion = fechaActualizacion;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getCampanaId() {
-        return campanaId;
     }
 
     public String getConcepto() {

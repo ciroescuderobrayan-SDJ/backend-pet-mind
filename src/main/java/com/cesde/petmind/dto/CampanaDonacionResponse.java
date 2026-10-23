@@ -14,9 +14,6 @@ import com.cesde.petmind.model.enums.EstadoCampana;
 // @AllArgsConstructor
 public class CampanaDonacionResponse {
 
-    private Long id;
-    private Long fundacionId;
-    private Long mascotaId;
     private String titulo;
     private String descripcion;
     private CategoriaCampana categoria;
@@ -31,9 +28,6 @@ public class CampanaDonacionResponse {
     private LocalDateTime fechaActualizacion;
 
     public CampanaDonacionResponse(
-            Long id,
-            Long fundacionId,
-            Long mascotaId,
             String titulo,
             String descripcion,
             CategoriaCampana categoria,
@@ -46,9 +40,6 @@ public class CampanaDonacionResponse {
             Boolean estadoActivo,
             LocalDateTime fechaCreacion,
             LocalDateTime fechaActualizacion) {
-        this.id = id;
-        this.fundacionId = fundacionId;
-        this.mascotaId = mascotaId;
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.categoria = categoria;
@@ -61,18 +52,6 @@ public class CampanaDonacionResponse {
         this.estadoActivo = estadoActivo;
         this.fechaCreacion = fechaCreacion;
         this.fechaActualizacion = fechaActualizacion;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getFundacionId() {
-        return fundacionId;
-    }
-
-    public Long getMascotaId() {
-        return mascotaId;
     }
 
     public String getTitulo() {
