@@ -81,19 +81,19 @@ public class ReporteAnimalServiceImpl implements ReporteAnimalService {
 
     private ReporteAnimal convertirAEntidad(ReporteAnimalRequest request) {
         ReporteAnimal reporte = new ReporteAnimal();
-        reporte.setTipoCaso(request.getTipoCaso());
-        reporte.setEspecie(request.getEspecie());
-        reporte.setNivelUrgencia(request.getNivelUrgencia());
-        reporte.setDireccion(request.getDireccion());
-        reporte.setLatitud(request.getLatitud());
-        reporte.setLongitud(request.getLongitud());
-        reporte.setDescripcion(request.getDescripcion());
-        reporte.setNombreContacto(request.getNombreContacto());
-        reporte.setTelefonoContacto(request.getTelefonoContacto());
-        reporte.setEsAnonimo(request.getEsAnonimo());
-        if (request.getUsuarioId() != null) {
+        reporte.setTipoCaso(request.tipoCaso());
+        reporte.setEspecie(request.especie());
+        reporte.setNivelUrgencia(request.nivelUrgencia());
+        reporte.setDireccion(request.direccion());
+        reporte.setLatitud(request.latitud());
+        reporte.setLongitud(request.longitud());
+        reporte.setDescripcion(request.descripcion());
+        reporte.setNombreContacto(request.nombreContacto());
+        reporte.setTelefonoContacto(request.telefonoContacto());
+        reporte.setEsAnonimo(request.esAnonimo());
+        if (request.usuarioId() != null) {
             Usuario usuario = new Usuario();
-            usuario.setId(request.getUsuarioId());
+            usuario.setId(request.usuarioId());
             reporte.setUsuario(usuario);
         }
         return reporte;

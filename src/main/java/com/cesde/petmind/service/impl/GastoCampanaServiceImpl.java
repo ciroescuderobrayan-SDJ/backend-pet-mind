@@ -44,11 +44,11 @@ public class GastoCampanaServiceImpl implements GastoCampanaService {
         GastoCampana existente = buscarActivo(gastoCampanaRepository, id, "un gasto de campana");
         existente.setCampana(buscarActivo(
                 campanaDonacionRepository,
-                request.getCampanaId(),
+                request.campanaId(),
                 "una campana activa"));
-        existente.setConcepto(request.getConcepto());
-        existente.setMonto(request.getMonto());
-        existente.setOrden(request.getOrden());
+        existente.setConcepto(request.concepto());
+        existente.setMonto(request.monto());
+        existente.setOrden(request.orden());
         return convertirAResponse(gastoCampanaRepository.save(existente));
     }
 
@@ -62,13 +62,13 @@ public class GastoCampanaServiceImpl implements GastoCampanaService {
     private GastoCampana convertirAEntidad(GastoCampanaRequest request) {
         CampanaDonacion campana = buscarActivo(
                 campanaDonacionRepository,
-                request.getCampanaId(),
+                request.campanaId(),
                 "una campana activa");
         GastoCampana gasto = new GastoCampana();
         gasto.setCampana(campana);
-        gasto.setConcepto(request.getConcepto());
-        gasto.setMonto(request.getMonto());
-        gasto.setOrden(request.getOrden());
+        gasto.setConcepto(request.concepto());
+        gasto.setMonto(request.monto());
+        gasto.setOrden(request.orden());
         return gasto;
     }
 
