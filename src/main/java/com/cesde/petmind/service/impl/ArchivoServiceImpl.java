@@ -1,11 +1,12 @@
 package com.cesde.petmind.service.impl;
 
+// Lombok deshabilitado temporalmente; implementacion manual abajo.
+// import lombok.RequiredArgsConstructor;
+// @RequiredArgsConstructor
+
 import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
-
 import java.util.List;
-
 import org.springframework.stereotype.Service;
-
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Archivo;
 import com.cesde.petmind.model.entity.CampanaDonacion;
@@ -21,22 +22,13 @@ import com.cesde.petmind.repository.ReporteAnimalRepository;
 import com.cesde.petmind.repository.SolicitudAdopcionRepository;
 import com.cesde.petmind.service.ArchivoService;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 public class ArchivoServiceImpl implements ArchivoService {
-
     private final ArchivoRepository archivoRepository;
-
     private final MascotaRepository mascotaRepository;
-
     private final SolicitudAdopcionRepository solicitudAdopcionRepository;
-
     private final CampanaDonacionRepository campanaDonacionRepository;
-
     private final HistoriaRepository historiaRepository;
-
     private final ReporteAnimalRepository reporteAnimalRepository;
 
     @Override
@@ -54,45 +46,38 @@ public class ArchivoServiceImpl implements ArchivoService {
     @Override
     public Archivo crear(Archivo archivo) {
         validarUnSoloDueno(archivo);
-
         // En el JSON solo llega el id del dueno; aca se trae el registro completo de la base
         if (archivo.getMascota() != null) {
             Long mascotaId = archivo.getMascota().getId();
             Mascota mascota = buscarActivo(mascotaRepository, mascotaId, "una mascota");
             archivo.setMascota(mascota);
         }
-
         if (archivo.getSolicitud() != null) {
             Long solicitudId = archivo.getSolicitud().getId();
             SolicitudAdopcion solicitud = buscarActivo(solicitudAdopcionRepository, solicitudId, "una solicitud");
             archivo.setSolicitud(solicitud);
         }
-
         if (archivo.getCampana() != null) {
             Long campanaId = archivo.getCampana().getId();
             CampanaDonacion campana = buscarActivo(campanaDonacionRepository, campanaId, "una campana");
             archivo.setCampana(campana);
         }
-
         if (archivo.getHistoria() != null) {
             Long historiaId = archivo.getHistoria().getId();
             Historia historia = buscarActivo(historiaRepository, historiaId, "una historia");
             archivo.setHistoria(historia);
         }
-
         if (archivo.getReporte() != null) {
             Long reporteId = archivo.getReporte().getId();
             ReporteAnimal reporte = buscarActivo(reporteAnimalRepository, reporteId, "un reporte");
             archivo.setReporte(reporte);
         }
-
         return archivoRepository.save(archivo);
     }
 
     @Override
     public Archivo actualizar(Long id, Archivo archivo) {
         Archivo existente = obtenerPorId(id);
-
         // Solo cambian los datos del archivo; el registro al que pertenece no cambia
         existente.setUrl(archivo.getUrl());
         existente.setTipoMedio(archivo.getTipoMedio());
@@ -105,7 +90,6 @@ public class ArchivoServiceImpl implements ArchivoService {
     @Override
     public void eliminar(Long id) {
         Archivo archivo = obtenerPorId(id);
-
         // Borrado logico: no se borra la fila, solo se desactiva
         archivo.setEstadoActivo(false);
         archivoRepository.save(archivo);
@@ -135,10 +119,16 @@ public class ArchivoServiceImpl implements ArchivoService {
         if (archivo.getReporte() != null) {
             duenos++;
         }
-
         if (duenos != 1) {
-            throw new ReglaDeNegocioException(
-                    "El archivo debe pertenecer a un solo registro: mascota, solicitud, campana, historia o reporte");
+            throw new ReglaDeNegocioException("El archivo debe pertenecer a un solo registro: mascota, solicitud, campana, historia o reporte");
         }
+    }
+    public ArchivoServiceImpl(final ArchivoRepository archivoRepository, final MascotaRepository mascotaRepository, final SolicitudAdopcionRepository solicitudAdopcionRepository, final CampanaDonacionRepository campanaDonacionRepository, final HistoriaRepository historiaRepository, final ReporteAnimalRepository reporteAnimalRepository) {
+        this.archivoRepository = archivoRepository;
+        this.mascotaRepository = mascotaRepository;
+        this.solicitudAdopcionRepository = solicitudAdopcionRepository;
+        this.campanaDonacionRepository = campanaDonacionRepository;
+        this.historiaRepository = historiaRepository;
+        this.reporteAnimalRepository = reporteAnimalRepository;
     }
 }

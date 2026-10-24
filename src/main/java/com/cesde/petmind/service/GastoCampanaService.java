@@ -1,14 +1,15 @@
 package com.cesde.petmind.service;
 
 import java.util.List;
-import com.cesde.petmind.model.entity.GastoCampana;
+import com.cesde.petmind.dto.GastoCampanaRequest;
+import com.cesde.petmind.dto.GastoCampanaResponse;
 
 public interface GastoCampanaService {
     
-     List<GastoCampana> listar();
-    GastoCampana obtenerPorId(Long id);
-    GastoCampana crear(GastoCampana gasto);
-    GastoCampana actualizar(Long id, GastoCampana gasto);
+    List<GastoCampanaResponse> listar();
+    GastoCampanaResponse obtenerPorId(Long id);
+    GastoCampanaResponse crear(GastoCampanaRequest request);
+    GastoCampanaResponse actualizar(Long id, GastoCampanaRequest request);
     void eliminar(Long id);
     
 }

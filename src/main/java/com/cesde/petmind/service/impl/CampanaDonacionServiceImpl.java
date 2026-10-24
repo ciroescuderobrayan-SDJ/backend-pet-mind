@@ -1,12 +1,15 @@
 package com.cesde.petmind.service.impl;
 
-import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
+// Lombok deshabilitado temporalmente; implementacion manual abajo.
+// import lombok.RequiredArgsConstructor;
+// @RequiredArgsConstructor
 
+import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
 import java.math.BigDecimal;
 import java.util.List;
-
 import org.springframework.stereotype.Service;
-
+import com.cesde.petmind.dto.CampanaDonacionRequest;
+import com.cesde.petmind.dto.CampanaDonacionResponse;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.CampanaDonacion;
 import com.cesde.petmind.model.entity.Fundacion;
@@ -17,61 +20,55 @@ import com.cesde.petmind.repository.FundacionRepository;
 import com.cesde.petmind.repository.MascotaRepository;
 import com.cesde.petmind.service.CampanaDonacionService;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 public class CampanaDonacionServiceImpl implements CampanaDonacionService {
-
     private final CampanaDonacionRepository campanaDonacionRepository;
     private final FundacionRepository fundacionRepository;
     private final MascotaRepository mascotaRepository;
 
     @Override
-    public List<CampanaDonacion> listar() {
-        return campanaDonacionRepository.findByEstadoActivoTrue();
+    public List<CampanaDonacionResponse> listar() {
+        return campanaDonacionRepository.findByEstadoActivoTrue().stream()
+                .map(this::convertirAResponse)
+                .toList();
     }
 
     @Override
-    public List<CampanaDonacion> listarPorEstado(EstadoCampana estado) {
+    public List<CampanaDonacionResponse> listarPorEstado(EstadoCampana estado) {
         if (estado == null) {
             throw new ReglaDeNegocioException("El estado de la campana es obligatorio");
         }
-
-        return campanaDonacionRepository.findByEstadoAndEstadoActivoTrue(estado);
+        return campanaDonacionRepository.findByEstadoAndEstadoActivoTrue(estado).stream()
+                .map(this::convertirAResponse)
+                .toList();
     }
 
     @Override
-    public CampanaDonacion obtenerPorId(Long id) {
+    public CampanaDonacionResponse obtenerPorId(Long id) {
         CampanaDonacion campana = buscarActivo(campanaDonacionRepository, id, "una campana");
-
-        return campana;
+        return convertirAResponse(campana);
     }
 
     @Override
-    public CampanaDonacion crear(CampanaDonacion campana) {
+    public CampanaDonacionResponse crear(CampanaDonacionRequest request) {
+        CampanaDonacion campana = convertirAEntidad(request);
         validarDatosCampana(campana);
         resolverRelaciones(campana);
-        return campanaDonacionRepository.save(campana);
+        return convertirAResponse(campanaDonacionRepository.save(campana));
     }
 
     @Override
-    public CampanaDonacion actualizar(Long id, CampanaDonacion campana) {
+    public CampanaDonacionResponse actualizar(Long id, CampanaDonacionRequest request) {
+        CampanaDonacion campana = convertirAEntidad(request);
         validarDatosCampana(campana);
-
-        CampanaDonacion existente = obtenerPorId(id);
-
+        CampanaDonacion existente = buscarActivo(campanaDonacionRepository, id, "una campana");
         if (campana.getFundacion() != null
                 && !campana.getFundacion().getId().equals(existente.getFundacion().getId())) {
             throw new ReglaDeNegocioException("La fundacion de una campana no puede cambiarse");
         }
-
         // Se guarda la mascota completa traida de la base; antes se guardaba el objeto del JSON
         // (solo con id) y la respuesta devolvia la mascota con nombre, especie, etc. en null.
-        Mascota mascota = campana.getMascota() == null
-                ? null
-                : validarMascota(campana.getMascota(), existente.getFundacion());
-
+        Mascota mascota = campana.getMascota() == null ? null : validarMascota(campana.getMascota(), existente.getFundacion());
         existente.setTitulo(campana.getTitulo());
         existente.setDescripcion(campana.getDescripcion());
         existente.setCategoria(campana.getCategoria());
@@ -82,13 +79,12 @@ public class CampanaDonacionServiceImpl implements CampanaDonacionService {
         existente.setEstado(campana.getEstado());
         existente.setEsUrgente(campana.getEsUrgente());
         existente.setMascota(mascota);
-
-        return campanaDonacionRepository.save(existente);
+        return convertirAResponse(campanaDonacionRepository.save(existente));
     }
 
     @Override
     public void eliminar(Long id) {
-        CampanaDonacion campana = obtenerPorId(id);
+        CampanaDonacion campana = buscarActivo(campanaDonacionRepository, id, "una campana");
         campana.setEstadoActivo(false);
         campanaDonacionRepository.save(campana);
     }
@@ -97,38 +93,27 @@ public class CampanaDonacionServiceImpl implements CampanaDonacionService {
         if (campana == null) {
             throw new ReglaDeNegocioException("La campana es obligatoria");
         }
-
         if (campana.getFundacion() == null || campana.getFundacion().getId() == null) {
             throw new ReglaDeNegocioException("La campana debe indicar una fundacion");
         }
-
-        if (campana.getMetaMonto() == null
-                || campana.getMetaMonto().compareTo(BigDecimal.ZERO) <= 0) {
+        if (campana.getMetaMonto() == null || campana.getMetaMonto().compareTo(BigDecimal.ZERO) <= 0) {
             throw new ReglaDeNegocioException("La meta de la campana debe ser mayor que cero");
         }
-
-        if (campana.getMontoRecaudado() != null
-                && campana.getMontoRecaudado().compareTo(BigDecimal.ZERO) < 0) {
+        if (campana.getMontoRecaudado() != null && campana.getMontoRecaudado().compareTo(BigDecimal.ZERO) < 0) {
             throw new ReglaDeNegocioException("El monto recaudado no puede ser negativo");
         }
-
         if (campana.getFechaInicio() == null) {
             throw new ReglaDeNegocioException("La campana debe indicar una fecha de inicio");
         }
-
-        if (campana.getFechaFin() != null
-                && campana.getFechaFin().isBefore(campana.getFechaInicio())) {
+        if (campana.getFechaFin() != null && campana.getFechaFin().isBefore(campana.getFechaInicio())) {
             throw new ReglaDeNegocioException("La fecha de fin no puede ser anterior a la fecha de inicio");
         }
     }
 
     private void resolverRelaciones(CampanaDonacion campana) {
         Long fundacionId = campana.getFundacion().getId();
-
         Fundacion fundacion = buscarActivo(fundacionRepository, fundacionId, "una fundacion activa");
-
         campana.setFundacion(fundacion);
-
         if (campana.getMascota() != null) {
             campana.setMascota(validarMascota(campana.getMascota(), fundacion));
         }
@@ -139,13 +124,57 @@ public class CampanaDonacionServiceImpl implements CampanaDonacionService {
         if (referencia.getId() == null) {
             throw new ReglaDeNegocioException("La mascota asociada debe indicar un id");
         }
-
         Mascota mascota = buscarActivo(mascotaRepository, referencia.getId(), "una mascota activa");
-
-        if (mascota.getFundacion() == null
-                || !mascota.getFundacion().getId().equals(fundacion.getId())) {
+        if (mascota.getFundacion() == null || !mascota.getFundacion().getId().equals(fundacion.getId())) {
             throw new ReglaDeNegocioException("La mascota debe pertenecer a la fundacion de la campana");
         }
         return mascota;
+    }
+
+    private CampanaDonacion convertirAEntidad(CampanaDonacionRequest request) {
+        CampanaDonacion campana = new CampanaDonacion();
+        Fundacion fundacion = new Fundacion();
+        fundacion.setId(request.getFundacionId());
+        campana.setFundacion(fundacion);
+        if (request.getMascotaId() != null) {
+            Mascota mascota = new Mascota();
+            mascota.setId(request.getMascotaId());
+            campana.setMascota(mascota);
+        }
+        campana.setTitulo(request.getTitulo());
+        campana.setDescripcion(request.getDescripcion());
+        campana.setCategoria(request.getCategoria());
+        campana.setMetaMonto(request.getMetaMonto());
+        campana.setFechaInicio(request.getFechaInicio());
+        campana.setFechaFin(request.getFechaFin());
+        campana.setEsUrgente(request.getEsUrgente());
+        campana.setMontoRecaudado(BigDecimal.ZERO);
+        campana.setEstado(EstadoCampana.ACTIVA);
+        return campana;
+    }
+
+    private CampanaDonacionResponse convertirAResponse(CampanaDonacion campana) {
+        return new CampanaDonacionResponse(
+                campana.getTitulo(),
+                campana.getDescripcion(),
+                campana.getCategoria(),
+                campana.getMetaMonto(),
+                campana.getMontoRecaudado(),
+                campana.getFechaInicio(),
+                campana.getFechaFin(),
+                campana.getEstado(),
+                campana.getEsUrgente(),
+                campana.getEstadoActivo(),
+                campana.getFechaCreacion(),
+                campana.getFechaActualizacion());
+    }
+
+    public CampanaDonacionServiceImpl(
+            final CampanaDonacionRepository campanaDonacionRepository,
+            final FundacionRepository fundacionRepository,
+            final MascotaRepository mascotaRepository) {
+        this.campanaDonacionRepository = campanaDonacionRepository;
+        this.fundacionRepository = fundacionRepository;
+        this.mascotaRepository = mascotaRepository;
     }
 }
