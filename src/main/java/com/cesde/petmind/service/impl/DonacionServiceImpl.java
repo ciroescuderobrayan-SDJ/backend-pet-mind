@@ -133,27 +133,27 @@ public class DonacionServiceImpl implements DonacionService {
 
     private Donacion convertirAEntidad(DonacionRequest request) {
         Donacion donacion = new Donacion();
-        donacion.setMonto(request.getMonto());
-        donacion.setFrecuencia(request.getFrecuencia());
-        donacion.setMetodoPago(request.getMetodoPago());
-        donacion.setEsAnonima(request.getEsAnonima());
-        donacion.setMensaje(request.getMensaje());
-        donacion.setNombreDonante(request.getNombreDonante());
-        donacion.setCorreoDonante(request.getCorreoDonante());
-        donacion.setDocumentoDonante(request.getDocumentoDonante());
-        if (request.getCampanaId() != null) {
+        donacion.setMonto(request.monto());
+        donacion.setFrecuencia(request.frecuencia());
+        donacion.setMetodoPago(request.metodoPago());
+        donacion.setEsAnonima(request.esAnonima());
+        donacion.setMensaje(request.mensaje());
+        donacion.setNombreDonante(request.nombreDonante());
+        donacion.setCorreoDonante(request.correoDonante());
+        donacion.setDocumentoDonante(request.documentoDonante());
+        if (request.campanaId() != null) {
             CampanaDonacion campana = new CampanaDonacion();
-            campana.setId(request.getCampanaId());
+            campana.setId(request.campanaId());
             donacion.setCampana(campana);
         }
-        if (request.getUsuarioId() != null) {
+        if (request.usuarioId() != null) {
             Usuario usuario = new Usuario();
-            usuario.setId(request.getUsuarioId());
+            usuario.setId(request.usuarioId());
             donacion.setUsuario(usuario);
         }
-        if (request.getDonacionOrigenId() != null) {
+        if (request.donacionOrigenId() != null) {
             Donacion origen = new Donacion();
-            origen.setId(request.getDonacionOrigenId());
+            origen.setId(request.donacionOrigenId());
             donacion.setDonacionOrigen(origen);
         }
         return donacion;
