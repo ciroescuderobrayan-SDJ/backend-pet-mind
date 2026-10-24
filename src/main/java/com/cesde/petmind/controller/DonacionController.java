@@ -1,7 +1,10 @@
 package com.cesde.petmind.controller;
 
-import java.util.List;
+// Lombok deshabilitado temporalmente; implementacion manual abajo.
+// import lombok.RequiredArgsConstructor;
+// @RequiredArgsConstructor
 
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,59 +16,57 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.cesde.petmind.model.entity.Donacion;
+import com.cesde.petmind.dto.DonacionRequest;
+import com.cesde.petmind.dto.DonacionResponse;
 import com.cesde.petmind.model.enums.EstadoDonacion;
 import com.cesde.petmind.service.DonacionService;
-
-import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/donaciones")
-@RequiredArgsConstructor
 public class DonacionController {
-
     private final DonacionService donacionService;
 
     @GetMapping
-    public ResponseEntity<List<Donacion>> listar() {
+    public ResponseEntity<List<DonacionResponse>> listar() {
         return ResponseEntity.ok(donacionService.listar());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Donacion> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<DonacionResponse> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(donacionService.obtenerPorId(id));
     }
 
     // Ejemplo: GET /api/donaciones/por-usuario?usuarioId=1
     @GetMapping("/por-usuario")
-    public ResponseEntity<List<Donacion>> listarPorUsuario(@RequestParam Long usuarioId) {
+    public ResponseEntity<List<DonacionResponse>> listarPorUsuario(@RequestParam Long usuarioId) {
         return ResponseEntity.ok(donacionService.listarPorUsuario(usuarioId));
     }
 
     // Ejemplo: GET /api/donaciones/por-campana?campanaId=1&estado=COMPLETADA
     @GetMapping("/por-campana")
-    public ResponseEntity<List<Donacion>> listarPorCampanaYEstado(
-            @RequestParam Long campanaId,
-            @RequestParam EstadoDonacion estado) {
+    public ResponseEntity<List<DonacionResponse>> listarPorCampanaYEstado(@RequestParam Long campanaId, @RequestParam EstadoDonacion estado) {
         return ResponseEntity.ok(donacionService.listarPorCampanaYEstado(campanaId, estado));
     }
 
     @PostMapping
-    public ResponseEntity<Donacion> crear(@RequestBody Donacion donacion) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(donacionService.crear(donacion));
+    public ResponseEntity<DonacionResponse> crear(@Valid @RequestBody DonacionRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(donacionService.crear(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Donacion> actualizar(
+    public ResponseEntity<DonacionResponse> actualizar(
             @PathVariable Long id,
-            @RequestBody Donacion donacion) {
-        return ResponseEntity.ok(donacionService.actualizar(id, donacion));
+            @Valid @RequestBody DonacionRequest request) {
+        return ResponseEntity.ok(donacionService.actualizar(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         donacionService.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+    public DonacionController(final DonacionService donacionService) {
+        this.donacionService = donacionService;
     }
 }

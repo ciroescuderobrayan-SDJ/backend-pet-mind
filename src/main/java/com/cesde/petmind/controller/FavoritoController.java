@@ -1,7 +1,10 @@
 package com.cesde.petmind.controller;
 
-import java.util.List;
+// Lombok deshabilitado temporalmente; implementacion manual abajo.
+// import lombok.RequiredArgsConstructor;
+// @RequiredArgsConstructor
 
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,17 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.cesde.petmind.model.entity.Favorito;
 import com.cesde.petmind.service.FavoritoService;
 
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/favoritos")
-@RequiredArgsConstructor
 public class FavoritoController {
-
     private final FavoritoService favoritoService;
 
     @GetMapping
@@ -50,5 +48,8 @@ public class FavoritoController {
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         favoritoService.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+    public FavoritoController(final FavoritoService favoritoService) {
+        this.favoritoService = favoritoService;
     }
 }
