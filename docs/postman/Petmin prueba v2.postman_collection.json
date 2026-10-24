@@ -1,0 +1,312 @@
+{
+  "info": {
+    "_postman_id": "829b7607-af9f-4731-a2a1-3f1809a416a1",
+    "name": "Petmin prueba v2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "57798376",
+    "_collection_link": "https://go.postman.co/collection/57798376-829b7607-af9f-4731-a2a1-3f1809a416a1?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "POST - CampanaDonacion",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"fundacionId\": 1,\r\n  \"titulo\": \"Ayuda para tratamiento veterinario\",\r\n  \"descripcion\": \"Campaña para cubrir los gastos del tratamiento veterinario y la recuperación de una mascota rescatada.\",\r\n  \"categoria\": \"SALUD\",\r\n  \"metaMonto\": 850000.00,\r\n  \"fechaInicio\": \"2026-10-24\",\r\n  \"fechaFin\": \"2026-11-24\",\r\n  \"esUrgente\": true\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/campanas-donacion",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "campanas-donacion"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Donacion",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"campanaId\": 1,\n  \"usuarioId\": 1,\n  \"monto\": 50000.00,\n  \"frecuencia\": \"UNICA\",\n  \"metodoPago\": \"PSE\",\n  \"esAnonima\": false,\n  \"mensaje\": \"Espero que esta donacion ayude a la campana.\",\n  \"nombreDonante\": \"Carlos Perez\",\n  \"correoDonante\": \"carlos.perez@example.com\",\n  \"documentoDonante\": \"1234567890\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/donaciones",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "donaciones"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST - GastosCampana",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/gastos-campana",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "gastos-campana"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Mascotas",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"fundacion\": {\r\n    \"id\": 1\r\n  },\r\n  \"nombre\": \"Luna\",\r\n  \"especie\": \"PERRO\",\r\n  \"raza\": \"Labrador mestizo\",\r\n  \"edadMeses\": 24,\r\n  \"tamano\": \"MEDIANO\",\r\n  \"sexo\": \"HEMBRA\",\r\n  \"ciudad\": \"Medellin\",\r\n  \"descripcion\": \"Luna es una perrita cariñosa, tranquila y sociable.\",\r\n  \"historia\": \"Fue rescatada y ahora busca una familia responsable.\",\r\n  \"etiquetas\": \"cariñosa, sociable, juguetona\",\r\n  \"estadoAdopcion\": \"DISPONIBLE\",\r\n  \"estadoPublicacion\": \"PUBLICADA\",\r\n  \"esterilizado\": true,\r\n  \"vacunasAlDia\": true,\r\n  \"desparasitado\": true,\r\n  \"tieneMicrochip\": false,\r\n  \"aptoApadrinamiento\": true,\r\n  \"contadorVisitas\": 0\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/mascotas",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "mascotas"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Favoritos",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"usuario\": {\r\n    \"id\": 1\r\n  },\r\n  \"mascota\": {\r\n    \"id\": 4\r\n  }\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/favoritos",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "favoritos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET - EVERYONE",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/usuarios?id=1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "usuarios"
+          ],
+          "query": [
+            {
+              "key": "id",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE - EVERYONE",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/campanas-donacion",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "campanas-donacion"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET - Mascotas ? parametrosConsulta=1",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/mascotas/por-estado?estadoPublicacion=PUBLICADA&estadoAdopcion=DISPONIBLE",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "mascotas",
+            "por-estado"
+          ],
+          "query": [
+            {
+              "key": "estadoPublicacion",
+              "value": "PUBLICADA"
+            },
+            {
+              "key": "estadoAdopcion",
+              "value": "DISPONIBLE"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET - CampanasDonacion ? parametrosConsulta=2",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/campanas-donacion/por-estado?estado=ACTIVA",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "campanas-donacion",
+            "por-estado"
+          ],
+          "query": [
+            {
+              "key": "estado",
+              "value": "ACTIVA"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET - Favoritos ? parametrosConsulta=3",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/favoritos/por-usuario?usuarioId=1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "favoritos",
+            "por-usuario"
+          ],
+          "query": [
+            {
+              "key": "usuarioId",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
