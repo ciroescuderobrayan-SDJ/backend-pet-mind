@@ -134,20 +134,20 @@ public class CampanaDonacionServiceImpl implements CampanaDonacionService {
     private CampanaDonacion convertirAEntidad(CampanaDonacionRequest request) {
         CampanaDonacion campana = new CampanaDonacion();
         Fundacion fundacion = new Fundacion();
-        fundacion.setId(request.getFundacionId());
+        fundacion.setId(request.fundacionId());
         campana.setFundacion(fundacion);
-        if (request.getMascotaId() != null) {
+        if (request.mascotaId() != null) {
             Mascota mascota = new Mascota();
-            mascota.setId(request.getMascotaId());
+            mascota.setId(request.mascotaId());
             campana.setMascota(mascota);
         }
-        campana.setTitulo(request.getTitulo());
-        campana.setDescripcion(request.getDescripcion());
-        campana.setCategoria(request.getCategoria());
-        campana.setMetaMonto(request.getMetaMonto());
-        campana.setFechaInicio(request.getFechaInicio());
-        campana.setFechaFin(request.getFechaFin());
-        campana.setEsUrgente(request.getEsUrgente());
+        campana.setTitulo(request.titulo());
+        campana.setDescripcion(request.descripcion());
+        campana.setCategoria(request.categoria());
+        campana.setMetaMonto(request.metaMonto());
+        campana.setFechaInicio(request.fechaInicio());
+        campana.setFechaFin(request.fechaFin());
+        campana.setEsUrgente(request.esUrgente());
         campana.setMontoRecaudado(BigDecimal.ZERO);
         campana.setEstado(EstadoCampana.ACTIVA);
         return campana;
