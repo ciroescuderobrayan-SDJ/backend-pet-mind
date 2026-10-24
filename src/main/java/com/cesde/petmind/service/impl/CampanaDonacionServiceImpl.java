@@ -8,6 +8,8 @@ import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
 import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import com.cesde.petmind.dto.CampanaDonacionRequest;
+import com.cesde.petmind.dto.CampanaDonacionResponse;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.CampanaDonacion;
 import com.cesde.petmind.model.entity.Fundacion;
@@ -25,36 +27,43 @@ public class CampanaDonacionServiceImpl implements CampanaDonacionService {
     private final MascotaRepository mascotaRepository;
 
     @Override
-    public List<CampanaDonacion> listar() {
-        return campanaDonacionRepository.findByEstadoActivoTrue();
+    public List<CampanaDonacionResponse> listar() {
+        return campanaDonacionRepository.findByEstadoActivoTrue().stream()
+                .map(this::convertirAResponse)
+                .toList();
     }
 
     @Override
-    public List<CampanaDonacion> listarPorEstado(EstadoCampana estado) {
+    public List<CampanaDonacionResponse> listarPorEstado(EstadoCampana estado) {
         if (estado == null) {
             throw new ReglaDeNegocioException("El estado de la campana es obligatorio");
         }
-        return campanaDonacionRepository.findByEstadoAndEstadoActivoTrue(estado);
+        return campanaDonacionRepository.findByEstadoAndEstadoActivoTrue(estado).stream()
+                .map(this::convertirAResponse)
+                .toList();
     }
 
     @Override
-    public CampanaDonacion obtenerPorId(Long id) {
+    public CampanaDonacionResponse obtenerPorId(Long id) {
         CampanaDonacion campana = buscarActivo(campanaDonacionRepository, id, "una campana");
-        return campana;
+        return convertirAResponse(campana);
     }
 
     @Override
-    public CampanaDonacion crear(CampanaDonacion campana) {
+    public CampanaDonacionResponse crear(CampanaDonacionRequest request) {
+        CampanaDonacion campana = convertirAEntidad(request);
         validarDatosCampana(campana);
         resolverRelaciones(campana);
-        return campanaDonacionRepository.save(campana);
+        return convertirAResponse(campanaDonacionRepository.save(campana));
     }
 
     @Override
-    public CampanaDonacion actualizar(Long id, CampanaDonacion campana) {
+    public CampanaDonacionResponse actualizar(Long id, CampanaDonacionRequest request) {
+        CampanaDonacion campana = convertirAEntidad(request);
         validarDatosCampana(campana);
-        CampanaDonacion existente = obtenerPorId(id);
-        if (campana.getFundacion() != null && !campana.getFundacion().getId().equals(existente.getFundacion().getId())) {
+        CampanaDonacion existente = buscarActivo(campanaDonacionRepository, id, "una campana");
+        if (campana.getFundacion() != null
+                && !campana.getFundacion().getId().equals(existente.getFundacion().getId())) {
             throw new ReglaDeNegocioException("La fundacion de una campana no puede cambiarse");
         }
         // Se guarda la mascota completa traida de la base; antes se guardaba el objeto del JSON
@@ -70,12 +79,12 @@ public class CampanaDonacionServiceImpl implements CampanaDonacionService {
         existente.setEstado(campana.getEstado());
         existente.setEsUrgente(campana.getEsUrgente());
         existente.setMascota(mascota);
-        return campanaDonacionRepository.save(existente);
+        return convertirAResponse(campanaDonacionRepository.save(existente));
     }
 
     @Override
     public void eliminar(Long id) {
-        CampanaDonacion campana = obtenerPorId(id);
+        CampanaDonacion campana = buscarActivo(campanaDonacionRepository, id, "una campana");
         campana.setEstadoActivo(false);
         campanaDonacionRepository.save(campana);
     }
@@ -121,7 +130,49 @@ public class CampanaDonacionServiceImpl implements CampanaDonacionService {
         }
         return mascota;
     }
-    public CampanaDonacionServiceImpl(final CampanaDonacionRepository campanaDonacionRepository, final FundacionRepository fundacionRepository, final MascotaRepository mascotaRepository) {
+
+    private CampanaDonacion convertirAEntidad(CampanaDonacionRequest request) {
+        CampanaDonacion campana = new CampanaDonacion();
+        Fundacion fundacion = new Fundacion();
+        fundacion.setId(request.getFundacionId());
+        campana.setFundacion(fundacion);
+        if (request.getMascotaId() != null) {
+            Mascota mascota = new Mascota();
+            mascota.setId(request.getMascotaId());
+            campana.setMascota(mascota);
+        }
+        campana.setTitulo(request.getTitulo());
+        campana.setDescripcion(request.getDescripcion());
+        campana.setCategoria(request.getCategoria());
+        campana.setMetaMonto(request.getMetaMonto());
+        campana.setFechaInicio(request.getFechaInicio());
+        campana.setFechaFin(request.getFechaFin());
+        campana.setEsUrgente(request.getEsUrgente());
+        campana.setMontoRecaudado(BigDecimal.ZERO);
+        campana.setEstado(EstadoCampana.ACTIVA);
+        return campana;
+    }
+
+    private CampanaDonacionResponse convertirAResponse(CampanaDonacion campana) {
+        return new CampanaDonacionResponse(
+                campana.getTitulo(),
+                campana.getDescripcion(),
+                campana.getCategoria(),
+                campana.getMetaMonto(),
+                campana.getMontoRecaudado(),
+                campana.getFechaInicio(),
+                campana.getFechaFin(),
+                campana.getEstado(),
+                campana.getEsUrgente(),
+                campana.getEstadoActivo(),
+                campana.getFechaCreacion(),
+                campana.getFechaActualizacion());
+    }
+
+    public CampanaDonacionServiceImpl(
+            final CampanaDonacionRepository campanaDonacionRepository,
+            final FundacionRepository fundacionRepository,
+            final MascotaRepository mascotaRepository) {
         this.campanaDonacionRepository = campanaDonacionRepository;
         this.fundacionRepository = fundacionRepository;
         this.mascotaRepository = mascotaRepository;
