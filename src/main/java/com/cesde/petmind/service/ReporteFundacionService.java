@@ -1,14 +1,19 @@
 package com.cesde.petmind.service;
 
 import java.util.List;
-import com.cesde.petmind.model.entity.ReporteFundacion;
+
+import com.cesde.petmind.dto.ReporteFundacionRequest;
+import com.cesde.petmind.dto.ReporteFundacionResponse;
 
 public interface ReporteFundacionService {
-    
-    List<ReporteFundacion> listar();
-    ReporteFundacion obtenerPorId(Long id);
-    ReporteFundacion crear(ReporteFundacion reporteFundacion);
-    ReporteFundacion actualizar(Long id, ReporteFundacion reporteFundacion);
+
+    List<ReporteFundacionResponse> listar();
+
+    ReporteFundacionResponse obtenerPorId(Long id);
+
+    ReporteFundacionResponse crear(ReporteFundacionRequest request);
+
+    ReporteFundacionResponse actualizar(Long id, ReporteFundacionRequest request);
+
     void eliminar(Long id);
-    
 }
