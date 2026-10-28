@@ -1,14 +1,19 @@
 package com.cesde.petmind.service;
 
 import java.util.List;
-import com.cesde.petmind.model.entity.Actualizacion;
+
+import com.cesde.petmind.dto.ActualizacionRequest;
+import com.cesde.petmind.dto.ActualizacionResponse;
 
 public interface ActualizacionService {
-    
-    List<Actualizacion> listar();
-    Actualizacion obtenerPorId(Long id);
-    Actualizacion crear(Actualizacion actualizacion);
-    Actualizacion actualizar(Long id, Actualizacion actualizacion);
-    void eliminar(Long id);
 
+    List<ActualizacionResponse> listar();
+
+    ActualizacionResponse obtenerPorId(Long id);
+
+    ActualizacionResponse crear(ActualizacionRequest request);
+
+    ActualizacionResponse actualizar(Long id, ActualizacionRequest request);
+
+    void eliminar(Long id);
 }
