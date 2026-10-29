@@ -5,9 +5,10 @@ package com.cesde.petmind.service.impl;
 // @RequiredArgsConstructor
 
 import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import com.cesde.petmind.dto.ActualizacionRequest;
+import com.cesde.petmind.dto.ActualizacionResponse;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Actualizacion;
 import com.cesde.petmind.model.entity.CampanaDonacion;
@@ -19,81 +20,137 @@ import com.cesde.petmind.service.ActualizacionService;
 
 @Service
 public class ActualizacionServiceImpl implements ActualizacionService {
+
     private final ActualizacionRepository actualizacionRepository;
     private final CampanaDonacionRepository campanaDonacionRepository;
     private final HistoriaRepository historiaRepository;
 
     @Override
-    public List<Actualizacion> listar() {
-        return actualizacionRepository.findByEstadoActivoTrue();
+    public List<ActualizacionResponse> listar() {
+        return actualizacionRepository.findByEstadoActivoTrue()
+                .stream()
+                .map(this::convertirAResponse)
+                .toList();
     }
 
     @Override
-    public Actualizacion obtenerPorId(Long id) {
-        Actualizacion actualizacion = buscarActivo(actualizacionRepository, id, "una actualizacion");
-        return actualizacion;
+    public ActualizacionResponse obtenerPorId(Long id) {
+        Actualizacion actualizacion = buscarActivo(
+                actualizacionRepository,
+                id,
+                "una actualización");
+
+        return convertirAResponse(actualizacion);
     }
 
     @Override
-    public Actualizacion crear(Actualizacion actualizacion) {
-        validarYAsignarRelacion(actualizacion);
-        if (actualizacion.getFechaEvento() == null) {
-            actualizacion.setFechaEvento(LocalDateTime.now());
-        }
-        return actualizacionRepository.save(actualizacion);
+    public ActualizacionResponse crear(ActualizacionRequest request) {
+        Actualizacion actualizacion = convertirAEntidad(request);
+
+        return convertirAResponse(
+                actualizacionRepository.save(actualizacion));
     }
 
     @Override
-    public Actualizacion actualizar(Long id, Actualizacion actualizacion) {
-        Actualizacion existente = obtenerPorId(id);
-        validarYAsignarRelacion(actualizacion);
+    public ActualizacionResponse actualizar(
+            Long id,
+            ActualizacionRequest request) {
+
+        Actualizacion existente = buscarActivo(
+                actualizacionRepository,
+                id,
+                "una actualización");
+
+        Actualizacion actualizacion = convertirAEntidad(request);
+
         existente.setCampana(actualizacion.getCampana());
         existente.setHistoria(actualizacion.getHistoria());
         existente.setTitulo(actualizacion.getTitulo());
         existente.setContenido(actualizacion.getContenido());
         existente.setFechaEvento(actualizacion.getFechaEvento());
         existente.setOrden(actualizacion.getOrden());
-        return actualizacionRepository.save(existente);
+
+        return convertirAResponse(
+                actualizacionRepository.save(existente));
     }
 
     @Override
     public void eliminar(Long id) {
-        Actualizacion actualizacion = obtenerPorId(id);
+        Actualizacion actualizacion = buscarActivo(
+                actualizacionRepository,
+                id,
+                "una actualización");
+
         actualizacion.setEstadoActivo(false);
         actualizacionRepository.save(actualizacion);
     }
 
-    private void validarYAsignarRelacion(Actualizacion actualizacion) {
-        int relaciones = 0;
-        if (actualizacion.getCampana() != null) {
-            relaciones++;
-        }
-        if (actualizacion.getHistoria() != null) {
-            relaciones++;
-        }
-        if (relaciones != 1) {
-            throw new ReglaDeNegocioException("La actualizacion debe pertenecer a una campana o a una historia");
-        }
-        if (actualizacion.getCampana() != null) {
-            if (actualizacion.getCampana().getId() == null) {
-                throw new ReglaDeNegocioException("La campana debe tener un id");
-            }
-            Long campanaId = actualizacion.getCampana().getId();
-            CampanaDonacion campana = buscarActivo(campanaDonacionRepository, campanaId, "una campana activa");
+    private Actualizacion convertirAEntidad(ActualizacionRequest request) {
+        validarRelaciones(request);
+
+        Actualizacion actualizacion = new Actualizacion();
+        actualizacion.setTitulo(request.titulo());
+        actualizacion.setContenido(request.contenido());
+        actualizacion.setFechaEvento(request.fechaEvento());
+        actualizacion.setOrden(request.orden());
+
+        if (request.campanaId() != null) {
+            CampanaDonacion campana = buscarActivo(
+                    campanaDonacionRepository,
+                    request.campanaId(),
+                    "una campaña activa");
+
             actualizacion.setCampana(campana);
             actualizacion.setHistoria(null);
         }
-        if (actualizacion.getHistoria() != null) {
-            if (actualizacion.getHistoria().getId() == null) {
-                throw new ReglaDeNegocioException("La historia debe tener un id");
-            }
-            Long historiaId = actualizacion.getHistoria().getId();
-            Historia historia = buscarActivo(historiaRepository, historiaId, "una historia activa");
+
+        if (request.historiaId() != null) {
+            Historia historia = buscarActivo(
+                    historiaRepository,
+                    request.historiaId(),
+                    "una historia activa");
+
             actualizacion.setHistoria(historia);
             actualizacion.setCampana(null);
         }
+
+        return actualizacion;
     }
-    public ActualizacionServiceImpl(final ActualizacionRepository actualizacionRepository, final CampanaDonacionRepository campanaDonacionRepository, final HistoriaRepository historiaRepository) {
+
+    private void validarRelaciones(ActualizacionRequest request) {
+        int relaciones = 0;
+
+        if (request.campanaId() != null) {
+            relaciones++;
+        }
+
+        if (request.historiaId() != null) {
+            relaciones++;
+        }
+
+        if (relaciones != 1) {
+            throw new ReglaDeNegocioException(
+                    "La actualización debe pertenecer a una campaña o a una historia");
+        }
+    }
+
+    private ActualizacionResponse convertirAResponse(
+            Actualizacion actualizacion) {
+
+        return new ActualizacionResponse(
+                actualizacion.getTitulo(),
+                actualizacion.getContenido(),
+                actualizacion.getFechaEvento(),
+                actualizacion.getOrden(),
+                actualizacion.getEstadoActivo(),
+                actualizacion.getFechaCreacion(),
+                actualizacion.getFechaActualizacion());
+    }
+
+    public ActualizacionServiceImpl(
+            ActualizacionRepository actualizacionRepository,
+            CampanaDonacionRepository campanaDonacionRepository,
+            HistoriaRepository historiaRepository) {
         this.actualizacionRepository = actualizacionRepository;
         this.campanaDonacionRepository = campanaDonacionRepository;
         this.historiaRepository = historiaRepository;

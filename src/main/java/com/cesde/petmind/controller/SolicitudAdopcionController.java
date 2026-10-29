@@ -16,43 +16,65 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.cesde.petmind.model.entity.SolicitudAdopcion;
+import com.cesde.petmind.dto.SolicitudAdopcionRequest;
+import com.cesde.petmind.dto.SolicitudAdopcionResponse;
 import com.cesde.petmind.model.enums.EstadoSolicitud;
 import com.cesde.petmind.service.SolicitudAdopcionService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/solicitudes-adopcion")
 public class SolicitudAdopcionController {
+
     private final SolicitudAdopcionService solicitudAdopcionService;
 
     @GetMapping
-    public ResponseEntity<List<SolicitudAdopcion>> listar() {
+    public ResponseEntity<List<SolicitudAdopcionResponse>> listar() {
         return ResponseEntity.ok(solicitudAdopcionService.listar());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SolicitudAdopcion> obtenerPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(solicitudAdopcionService.obtenerPorId(id));
+    public ResponseEntity<SolicitudAdopcionResponse> obtenerPorId(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                solicitudAdopcionService.obtenerPorId(id));
     }
 
     @GetMapping("/por-usuario")
-    public ResponseEntity<List<SolicitudAdopcion>> listarPorUsuario(@RequestParam Long usuarioId) {
-        return ResponseEntity.ok(solicitudAdopcionService.listarPorUsuario(usuarioId));
+    public ResponseEntity<List<SolicitudAdopcionResponse>> listarPorUsuario(
+            @RequestParam Long usuarioId) {
+
+        return ResponseEntity.ok(
+                solicitudAdopcionService.listarPorUsuario(usuarioId));
     }
 
     @GetMapping("/por-fundacion")
-    public ResponseEntity<List<SolicitudAdopcion>> listarPorFundacionYEstado(@RequestParam Long fundacionId, @RequestParam EstadoSolicitud estado) {
-        return ResponseEntity.ok(solicitudAdopcionService.listarPorFundacionYEstado(fundacionId, estado));
+    public ResponseEntity<List<SolicitudAdopcionResponse>>
+            listarPorFundacionYEstado(
+                    @RequestParam Long fundacionId,
+                    @RequestParam EstadoSolicitud estado) {
+
+        return ResponseEntity.ok(
+                solicitudAdopcionService
+                        .listarPorFundacionYEstado(fundacionId, estado));
     }
 
     @PostMapping
-    public ResponseEntity<SolicitudAdopcion> crear(@RequestBody SolicitudAdopcion solicitud) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(solicitudAdopcionService.crear(solicitud));
+    public ResponseEntity<SolicitudAdopcionResponse> crear(
+            @Valid @RequestBody SolicitudAdopcionRequest request) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(solicitudAdopcionService.crear(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SolicitudAdopcion> actualizar(@PathVariable Long id, @RequestBody SolicitudAdopcion solicitud) {
-        return ResponseEntity.ok(solicitudAdopcionService.actualizar(id, solicitud));
+    public ResponseEntity<SolicitudAdopcionResponse> actualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody SolicitudAdopcionRequest request) {
+
+        return ResponseEntity.ok(
+                solicitudAdopcionService.actualizar(id, request));
     }
 
     @DeleteMapping("/{id}")
@@ -60,7 +82,9 @@ public class SolicitudAdopcionController {
         solicitudAdopcionService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
-    public SolicitudAdopcionController(final SolicitudAdopcionService solicitudAdopcionService) {
+
+    public SolicitudAdopcionController(
+            SolicitudAdopcionService solicitudAdopcionService) {
         this.solicitudAdopcionService = solicitudAdopcionService;
     }
 }
