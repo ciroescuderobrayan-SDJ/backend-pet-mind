@@ -9,6 +9,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.cesde.petmind.dto.ContactoDto;
+import com.cesde.petmind.dto.DireccionDto;
+import com.cesde.petmind.dto.UsuarioRequest;
+import com.cesde.petmind.dto.UsuarioResponse;
 import com.cesde.petmind.exceptions.RecursoDuplicadoException;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Fundacion;
@@ -31,30 +36,35 @@ public class UsuarioServiceImpl implements UsuarioService {
     private static final Pattern CARACTER_ESPECIAL = Pattern.compile("[^\\p{L}\\p{N}\\s]");
 
     @Override
-    public List<Usuario> listar() {
-        return usuarioRepository.findByEstadoActivoTrue();
+    @Transactional(readOnly = true)
+    public List<UsuarioResponse> listar() {
+        return usuarioRepository.findByEstadoActivoTrue().stream().map(this::aResponse).toList();
     }
 
     @Override
-    public Usuario obtenerPorId(Long id) {
+    @Transactional(readOnly = true)
+    public UsuarioResponse obtenerPorId(Long id) {
         // Un usuario borrado logicamente se trata igual que uno que no existe
-        Usuario usuario = buscarActivo(usuarioRepository, id, "un usuario");
-        return usuario;
+        return aResponse(buscarUsuario(id));
     }
 
     @Override
-    public Usuario crear(Usuario usuario) {
+    @Transactional
+    public UsuarioResponse crear(UsuarioRequest request) {
+        Usuario usuario = aEntidad(request);
         normalizarCorreo(usuario);
         validarContrasenaSegura(usuario);
         validarRolPermitido(usuario);
         validarCorreoUnico(usuario);
         validarFundacionDelRepresentante(usuario);
-        return usuarioRepository.save(usuario);
+        return aResponse(usuarioRepository.save(usuario));
     }
 
     @Override
-    public Usuario actualizar(Long id, Usuario usuario) {
-        Usuario existente = obtenerPorId(id);
+    @Transactional
+    public UsuarioResponse actualizar(Long id, UsuarioRequest request) {
+        Usuario existente = buscarUsuario(id);
+        Usuario usuario = aEntidad(request);
         normalizarCorreo(usuario);
         // Por PUT nadie puede volverse ADMIN: antes bastaba enviar "rol": "ADMIN" para obtener el rol
         if (usuario.getRol() == RolUsuario.ADMIN && existente.getRol() != RolUsuario.ADMIN) {
@@ -62,7 +72,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
         // La regla del correo solo se revisa si el correo cambio
         String correoActual = existente.getContacto().getEmailContacto();
-        if (usuario.getContacto() == null || !correoActual.equalsIgnoreCase(usuario.getContacto().getEmailContacto())) {
+        if (usuario.getContacto() == null || correoActual == null || !correoActual.equalsIgnoreCase(usuario.getContacto().getEmailContacto())) {
             validarCorreoUnico(usuario);
         }
         validarFundacionDelRepresentante(usuario);
@@ -74,12 +84,13 @@ public class UsuarioServiceImpl implements UsuarioService {
         existente.setUrlAvatar(usuario.getUrlAvatar());
         existente.setRol(usuario.getRol());
         existente.setFundacion(usuario.getFundacion());
-        return usuarioRepository.save(existente);
+        return aResponse(usuarioRepository.save(existente));
     }
 
     @Override
+    @Transactional
     public void eliminar(Long id) {
-        Usuario usuario = obtenerPorId(id);
+        Usuario usuario = buscarUsuario(id);
         // Borrado logico: no se borra la fila, solo se desactiva
         usuario.setEstadoActivo(false);
         usuarioRepository.save(usuario);
@@ -103,7 +114,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     // Validacion: el correo es obligatorio y no puede estar registrado por otro usuario
     private void validarCorreoUnico(Usuario usuario) {
-        if (usuario.getContacto() == null || usuario.getContacto().getEmailContacto() == null) {
+        if (usuario.getContacto() == null || usuario.getContacto().getEmailContacto() == null || usuario.getContacto().getEmailContacto().isBlank()) {
             throw new ReglaDeNegocioException("El correo del usuario es obligatorio");
         }
         String correo = usuario.getContacto().getEmailContacto();
@@ -137,6 +148,34 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
         // Se guarda la fundacion completa traida de la base, no solo el id que llego en el JSON
         usuario.setFundacion(fundacion);
+    }
+
+    private Usuario buscarUsuario(Long id) {
+        return buscarActivo(usuarioRepository, id, "un usuario");
+    }
+
+    private Usuario aEntidad(UsuarioRequest request) {
+        Usuario usuario = new Usuario();
+        usuario.setNombre(request.nombre());
+        usuario.setApellido(request.apellido());
+        usuario.setContrasena(request.contrasena());
+        usuario.setContacto(request.contacto() == null ? null : request.contacto().aEntidad());
+        usuario.setDireccion(request.direccion() == null ? null : request.direccion().aEntidad());
+        usuario.setUrlAvatar(request.urlAvatar());
+        usuario.setRol(request.rol());
+        if (request.fundacionId() != null) {
+            Fundacion fundacion = new Fundacion();
+            fundacion.setId(request.fundacionId());
+            usuario.setFundacion(fundacion);
+        }
+        return usuario;
+    }
+
+    private UsuarioResponse aResponse(Usuario usuario) {
+        return new UsuarioResponse(usuario.getId(), usuario.getFundacion() == null ? null : usuario.getFundacion().getId(),
+                usuario.getNombre(), usuario.getApellido(), ContactoDto.desde(usuario.getContacto()),
+                DireccionDto.desde(usuario.getDireccion()), usuario.getUrlAvatar(), usuario.getRol(),
+                usuario.getCorreoVerificado(), usuario.getEstadoActivo(), usuario.getFechaCreacion(), usuario.getFechaActualizacion());
     }
     public UsuarioServiceImpl(final UsuarioRepository usuarioRepository, final FundacionRepository fundacionRepository) {
         this.usuarioRepository = usuarioRepository;

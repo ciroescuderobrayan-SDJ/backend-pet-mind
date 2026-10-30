@@ -1,7 +1,7 @@
 package com.cesde.petmind.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -21,8 +21,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.cesde.petmind.exceptions.RecursoDuplicadoException;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
+import com.cesde.petmind.dto.ContactoDto;
+import com.cesde.petmind.dto.UsuarioRequest;
+import com.cesde.petmind.dto.UsuarioResponse;
+import com.cesde.petmind.model.entity.Fundacion;
 import com.cesde.petmind.model.embeddable.InformacionContacto;
 import com.cesde.petmind.model.entity.Usuario;
+import com.cesde.petmind.model.enums.EstadoVerificacion;
 import com.cesde.petmind.model.enums.RolUsuario;
 import com.cesde.petmind.repository.FundacionRepository;
 import com.cesde.petmind.repository.UsuarioRepository;
@@ -56,6 +61,12 @@ class UsuarioServiceImplTest {
                 .build();
     }
 
+    private UsuarioRequest request(Usuario usuario) {
+        return new UsuarioRequest(usuario.getFundacion() == null ? null : usuario.getFundacion().getId(),
+                usuario.getNombre(), usuario.getApellido(), usuario.getContrasena(),
+                ContactoDto.desde(usuario.getContacto()), null, usuario.getUrlAvatar(), usuario.getRol());
+    }
+
     @ParameterizedTest
     @ValueSource(strings = { "Petmind#1", "Clave$egura", "ÑandúFeliz!" })
     void crearAceptaContrasenaQueCumpleLaRegla(String contrasena) {
@@ -63,7 +74,7 @@ class UsuarioServiceImplTest {
         when(usuarioRepository.existsByContactoEmailContactoIgnoreCase("prueba@correo.com")).thenReturn(false);
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer((invocacion) -> invocacion.getArgument(0));
 
-        assertSame(usuario, usuarioService.crear(usuario));
+        assertEquals("Ana", usuarioService.crear(request(usuario)).nombre());
     }
 
     @ParameterizedTest
@@ -78,7 +89,7 @@ class UsuarioServiceImplTest {
         Usuario usuario = usuarioConContrasena(contrasena);
 
         ReglaDeNegocioException error =
-                assertThrows(ReglaDeNegocioException.class, () -> usuarioService.crear(usuario));
+                assertThrows(ReglaDeNegocioException.class, () -> usuarioService.crear(request(usuario)));
 
         assertEquals(MENSAJE, error.getMessage());
         verify(usuarioRepository, never()).save(any(Usuario.class));
@@ -87,7 +98,7 @@ class UsuarioServiceImplTest {
     @Test
     void crearValidaLaContrasenaAntesQueElCorreo() {
         // Si la contrasena es invalida no se consulta la base para revisar el correo.
-        assertThrows(ReglaDeNegocioException.class, () -> usuarioService.crear(usuarioConContrasena("corta")));
+        assertThrows(ReglaDeNegocioException.class, () -> usuarioService.crear(request(usuarioConContrasena("corta"))));
 
         verify(usuarioRepository, never()).existsByContactoEmailContactoIgnoreCase(any());
     }
@@ -99,7 +110,7 @@ class UsuarioServiceImplTest {
         when(usuarioRepository.existsByContactoEmailContactoIgnoreCase("ana.gomez@correo.com")).thenReturn(false);
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer((invocacion) -> invocacion.getArgument(0));
 
-        assertEquals("ana.gomez@correo.com", usuarioService.crear(usuario).getContacto().getEmailContacto());
+        assertEquals("ana.gomez@correo.com", usuarioService.crear(request(usuario)).contacto().emailContacto());
     }
 
     @Test
@@ -108,7 +119,7 @@ class UsuarioServiceImplTest {
         usuario.getContacto().setEmailContacto("PRUEBA@correo.com");
         when(usuarioRepository.existsByContactoEmailContactoIgnoreCase("prueba@correo.com")).thenReturn(true);
 
-        assertThrows(RecursoDuplicadoException.class, () -> usuarioService.crear(usuario));
+        assertThrows(RecursoDuplicadoException.class, () -> usuarioService.crear(request(usuario)));
         verify(usuarioRepository, never()).save(any(Usuario.class));
     }
 
@@ -121,7 +132,7 @@ class UsuarioServiceImplTest {
         cambios.setRol(RolUsuario.ADMIN);
 
         ReglaDeNegocioException error =
-                assertThrows(ReglaDeNegocioException.class, () -> usuarioService.actualizar(1L, cambios));
+                assertThrows(ReglaDeNegocioException.class, () -> usuarioService.actualizar(1L, request(cambios)));
 
         assertEquals("No se puede asignar el rol ADMIN a un usuario", error.getMessage());
         verify(usuarioRepository, never()).save(any(Usuario.class));
@@ -136,8 +147,48 @@ class UsuarioServiceImplTest {
         Usuario cambios = usuarioConContrasena(null);
         cambios.getContacto().setEmailContacto("Prueba@Correo.com");
 
-        usuarioService.actualizar(1L, cambios);
+        usuarioService.actualizar(1L, request(cambios));
 
         verify(usuarioRepository, never()).existsByContactoEmailContactoIgnoreCase(any());
+    }
+
+    @Test
+    void representanteDevuelveIdsYResuelveFundacionVerificada() {
+        Fundacion fundacion = new Fundacion();
+        fundacion.setId(9L);
+        fundacion.setEstadoVerificacion(EstadoVerificacion.VERIFICADA);
+        Usuario usuario = usuarioConContrasena("Petmind#1");
+        usuario.setRol(RolUsuario.REPRESENTANTE_FUNDACION);
+        usuario.setFundacion(fundacion);
+        when(fundacionRepository.findById(9L)).thenReturn(Optional.of(fundacion));
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocacion -> {
+            Usuario guardado = invocacion.getArgument(0);
+            assertEquals(fundacion, guardado.getFundacion());
+            guardado.setId(7L);
+            return guardado;
+        });
+
+        UsuarioResponse respuesta = usuarioService.crear(request(usuario));
+
+        assertEquals(7L, respuesta.id());
+        assertEquals(9L, respuesta.fundacionId());
+    }
+
+    @Test
+    void actualizarConservaContrasenaYVerificacion() {
+        Usuario existente = usuarioConContrasena("Petmind#1");
+        existente.setId(1L);
+        existente.setCorreoVerificado(true);
+        existente.setTokenCodigo("token-interno");
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(existente));
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocacion -> invocacion.getArgument(0));
+        Usuario cambios = usuarioConContrasena("OtraClave#1");
+
+        UsuarioResponse respuesta = usuarioService.actualizar(1L, request(cambios));
+
+        assertEquals("Petmind#1", existente.getContrasena());
+        assertEquals("token-interno", existente.getTokenCodigo());
+        assertEquals(true, respuesta.correoVerificado());
+        assertNull(respuesta.fundacionId());
     }
 }
