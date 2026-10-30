@@ -3,6 +3,9 @@ package com.cesde.petmind.dto;
 import java.time.LocalDateTime;
 
 public record ActualizacionResponse(
+        Long id,
+        Long campanaId,
+        Long historiaId,
         String titulo,
         String contenido,
         LocalDateTime fechaEvento,

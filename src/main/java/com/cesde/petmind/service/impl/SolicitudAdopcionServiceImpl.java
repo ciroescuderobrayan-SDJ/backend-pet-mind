@@ -8,6 +8,7 @@ import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.cesde.petmind.dto.SolicitudAdopcionRequest;
 import com.cesde.petmind.dto.SolicitudAdopcionResponse;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
@@ -22,6 +23,7 @@ import com.cesde.petmind.repository.UsuarioRepository;
 import com.cesde.petmind.service.SolicitudAdopcionService;
 
 @Service
+@Transactional
 public class SolicitudAdopcionServiceImpl implements SolicitudAdopcionService {
 
     private final SolicitudAdopcionRepository solicitudAdopcionRepository;
@@ -140,6 +142,9 @@ public class SolicitudAdopcionServiceImpl implements SolicitudAdopcionService {
             SolicitudAdopcion solicitud) {
 
         return new SolicitudAdopcionResponse(
+                solicitud.getId(),
+                solicitud.getUsuario() == null ? null : solicitud.getUsuario().getId(),
+                solicitud.getMascota() == null ? null : solicitud.getMascota().getId(),
                 solicitud.getEstado(),
                 solicitud.getPorcentajeAfinidad(),
                 solicitud.getDatosHogar(),

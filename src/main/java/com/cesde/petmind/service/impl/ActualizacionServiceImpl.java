@@ -7,6 +7,7 @@ package com.cesde.petmind.service.impl;
 import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.cesde.petmind.dto.ActualizacionRequest;
 import com.cesde.petmind.dto.ActualizacionResponse;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
@@ -19,6 +20,7 @@ import com.cesde.petmind.repository.HistoriaRepository;
 import com.cesde.petmind.service.ActualizacionService;
 
 @Service
+@Transactional
 public class ActualizacionServiceImpl implements ActualizacionService {
 
     private final ActualizacionRepository actualizacionRepository;
@@ -138,6 +140,9 @@ public class ActualizacionServiceImpl implements ActualizacionService {
             Actualizacion actualizacion) {
 
         return new ActualizacionResponse(
+                actualizacion.getId(),
+                actualizacion.getCampana() == null ? null : actualizacion.getCampana().getId(),
+                actualizacion.getHistoria() == null ? null : actualizacion.getHistoria().getId(),
                 actualizacion.getTitulo(),
                 actualizacion.getContenido(),
                 actualizacion.getFechaEvento(),

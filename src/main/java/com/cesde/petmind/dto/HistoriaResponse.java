@@ -5,6 +5,9 @@ import java.time.LocalDateTime;
 import com.cesde.petmind.model.enums.TipoHistoria;
 
 public record HistoriaResponse(
+        Long id,
+        Long fundacionId,
+        Long mascotaId,
         String titulo,
         String resumen,
         String contenido,

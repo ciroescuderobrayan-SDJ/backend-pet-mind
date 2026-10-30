@@ -8,6 +8,7 @@ import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.cesde.petmind.dto.MascotaRequest;
 import com.cesde.petmind.dto.MascotaResponse;
 import com.cesde.petmind.model.entity.Fundacion;
@@ -20,6 +21,7 @@ import com.cesde.petmind.repository.MascotaRepository;
 import com.cesde.petmind.service.MascotaService;
 
 @Service
+@Transactional
 public class MascotaServiceImpl implements MascotaService {
 
     private final MascotaRepository mascotaRepository;
@@ -162,6 +164,8 @@ public class MascotaServiceImpl implements MascotaService {
 
     private MascotaResponse convertirAResponse(Mascota mascota) {
         return new MascotaResponse(
+                mascota.getId(),
+                mascota.getFundacion() == null ? null : mascota.getFundacion().getId(),
                 mascota.getNombre(),
                 mascota.getEspecie(),
                 mascota.getRaza(),

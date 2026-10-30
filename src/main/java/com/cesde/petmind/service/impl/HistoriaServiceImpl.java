@@ -8,6 +8,7 @@ import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.cesde.petmind.dto.HistoriaRequest;
 import com.cesde.petmind.dto.HistoriaResponse;
 import com.cesde.petmind.model.entity.Fundacion;
@@ -19,6 +20,7 @@ import com.cesde.petmind.repository.MascotaRepository;
 import com.cesde.petmind.service.HistoriaService;
 
 @Service
+@Transactional
 public class HistoriaServiceImpl implements HistoriaService {
 
     private final HistoriaRepository historiaRepository;
@@ -107,6 +109,9 @@ public class HistoriaServiceImpl implements HistoriaService {
 
     private HistoriaResponse convertirAResponse(Historia historia) {
         return new HistoriaResponse(
+                historia.getId(),
+                historia.getFundacion() == null ? null : historia.getFundacion().getId(),
+                historia.getMascota() == null ? null : historia.getMascota().getId(),
                 historia.getTitulo(),
                 historia.getResumen(),
                 historia.getContenido(),

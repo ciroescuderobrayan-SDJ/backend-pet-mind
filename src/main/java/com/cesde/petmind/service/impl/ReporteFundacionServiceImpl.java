@@ -8,6 +8,7 @@ import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.cesde.petmind.dto.ReporteFundacionRequest;
 import com.cesde.petmind.dto.ReporteFundacionResponse;
 import com.cesde.petmind.model.entity.Fundacion;
@@ -19,6 +20,7 @@ import com.cesde.petmind.repository.ReporteFundacionRepository;
 import com.cesde.petmind.service.ReporteFundacionService;
 
 @Service
+@Transactional
 public class ReporteFundacionServiceImpl implements ReporteFundacionService {
 
     private final ReporteFundacionRepository reporteFundacionRepository;
@@ -119,6 +121,9 @@ public class ReporteFundacionServiceImpl implements ReporteFundacionService {
             ReporteFundacion reporteFundacion) {
 
         return new ReporteFundacionResponse(
+                reporteFundacion.getId(),
+                reporteFundacion.getReporte() == null ? null : reporteFundacion.getReporte().getId(),
+                reporteFundacion.getFundacion() == null ? null : reporteFundacion.getFundacion().getId(),
                 reporteFundacion.getDistanciaKm(),
                 reporteFundacion.getEstadoAtencion(),
                 reporteFundacion.getFechaNotificacion(),

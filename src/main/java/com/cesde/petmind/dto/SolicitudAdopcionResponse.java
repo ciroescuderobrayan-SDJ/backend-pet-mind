@@ -8,6 +8,9 @@ import com.cesde.petmind.model.embeddable.DatosHogar;
 import com.cesde.petmind.model.enums.EstadoSolicitud;
 
 public record SolicitudAdopcionResponse(
+        Long id,
+        Long usuarioId,
+        Long mascotaId,
         EstadoSolicitud estado,
         Integer porcentajeAfinidad,
         DatosHogar datosHogar,

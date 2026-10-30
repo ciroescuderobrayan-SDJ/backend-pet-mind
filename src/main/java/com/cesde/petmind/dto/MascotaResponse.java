@@ -11,6 +11,8 @@ import com.cesde.petmind.model.enums.SexoMascota;
 import com.cesde.petmind.model.enums.TamanoMascota;
 
 public record MascotaResponse(
+        Long id,
+        Long fundacionId,
         String nombre,
         Especie especie,
         String raza,
