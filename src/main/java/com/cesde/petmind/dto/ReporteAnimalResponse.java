@@ -11,6 +11,8 @@ import com.cesde.petmind.model.enums.NivelUrgencia;
 import com.cesde.petmind.model.enums.TipoCaso;
 
 public record ReporteAnimalResponse(
+        Long id,
+        Long usuarioId,
         String codigoSeguimiento,
         TipoCaso tipoCaso,
         Especie especie,

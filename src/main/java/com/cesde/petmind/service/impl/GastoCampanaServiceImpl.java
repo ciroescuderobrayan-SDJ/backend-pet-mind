@@ -7,6 +7,7 @@ package com.cesde.petmind.service.impl;
 import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.cesde.petmind.dto.GastoCampanaRequest;
 import com.cesde.petmind.dto.GastoCampanaResponse;
 import com.cesde.petmind.model.entity.CampanaDonacion;
@@ -16,6 +17,7 @@ import com.cesde.petmind.repository.GastoCampanaRepository;
 import com.cesde.petmind.service.GastoCampanaService;
 
 @Service
+@Transactional
 public class GastoCampanaServiceImpl implements GastoCampanaService {
     private final GastoCampanaRepository gastoCampanaRepository;
     private final CampanaDonacionRepository campanaDonacionRepository;
@@ -74,6 +76,8 @@ public class GastoCampanaServiceImpl implements GastoCampanaService {
 
     private GastoCampanaResponse convertirAResponse(GastoCampana gasto) {
         return new GastoCampanaResponse(
+                gasto.getId(),
+                gasto.getCampana() == null ? null : gasto.getCampana().getId(),
                 gasto.getConcepto(),
                 gasto.getMonto(),
                 gasto.getOrden(),

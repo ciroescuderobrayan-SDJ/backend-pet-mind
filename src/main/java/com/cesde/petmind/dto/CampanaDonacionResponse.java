@@ -8,6 +8,9 @@ import com.cesde.petmind.model.enums.CategoriaCampana;
 import com.cesde.petmind.model.enums.EstadoCampana;
 
 public record CampanaDonacionResponse(
+        Long id,
+        Long fundacionId,
+        Long mascotaId,
         String titulo,
         String descripcion,
         CategoriaCampana categoria,

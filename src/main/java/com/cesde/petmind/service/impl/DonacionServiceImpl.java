@@ -8,6 +8,7 @@ import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
 import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.dto.DonacionRequest;
 import com.cesde.petmind.dto.DonacionResponse;
@@ -21,6 +22,7 @@ import com.cesde.petmind.repository.UsuarioRepository;
 import com.cesde.petmind.service.DonacionService;
 
 @Service
+@Transactional
 public class DonacionServiceImpl implements DonacionService {
     private final DonacionRepository donacionRepository;
     private final UsuarioRepository usuarioRepository;
@@ -161,6 +163,10 @@ public class DonacionServiceImpl implements DonacionService {
 
     private DonacionResponse convertirAResponse(Donacion donacion) {
         return new DonacionResponse(
+                donacion.getId(),
+                donacion.getCampana() == null ? null : donacion.getCampana().getId(),
+                donacion.getUsuario() == null ? null : donacion.getUsuario().getId(),
+                donacion.getDonacionOrigen() == null ? null : donacion.getDonacionOrigen().getId(),
                 donacion.getMonto(),
                 donacion.getValorComision(),
                 donacion.getMontoTotal(),

@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.cesde.petmind.dto.ReporteAnimalRequest;
 import com.cesde.petmind.dto.ReporteAnimalResponse;
 import com.cesde.petmind.model.entity.Usuario;
@@ -19,6 +20,7 @@ import com.cesde.petmind.repository.UsuarioRepository;
 import com.cesde.petmind.service.ReporteAnimalService;
 
 @Service
+@Transactional
 public class ReporteAnimalServiceImpl implements ReporteAnimalService {
     private final ReporteAnimalRepository reporteAnimalRepository;
     private final UsuarioRepository usuarioRepository;
@@ -114,6 +116,8 @@ public class ReporteAnimalServiceImpl implements ReporteAnimalService {
 
     private ReporteAnimalResponse convertirAResponse(ReporteAnimal reporte) {
         return new ReporteAnimalResponse(
+                reporte.getId(),
+                reporte.getUsuario() == null ? null : reporte.getUsuario().getId(),
                 reporte.getCodigoSeguimiento(),
                 reporte.getTipoCaso(),
                 reporte.getEspecie(),

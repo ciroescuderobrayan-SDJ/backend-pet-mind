@@ -10,6 +10,10 @@ import com.cesde.petmind.model.enums.Frecuencia;
 import com.cesde.petmind.model.enums.MetodoPago;
 
 public record DonacionResponse(
+        Long id,
+        Long campanaId,
+        Long usuarioId,
+        Long donacionOrigenId,
         BigDecimal monto,
         BigDecimal valorComision,
         BigDecimal montoTotal,
