@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.cesde.petmind.model.entity.Archivo;
+import com.cesde.petmind.dto.ArchivoRequest;
+import com.cesde.petmind.dto.ArchivoResponse;
 import com.cesde.petmind.service.ArchivoService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/archivos")
@@ -25,28 +27,28 @@ public class ArchivoController {
     private final ArchivoService archivoService;
 
     @GetMapping
-    public ResponseEntity<List<Archivo>> listar() {
+    public ResponseEntity<List<ArchivoResponse>> listar() {
         return ResponseEntity.ok(archivoService.listar());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Archivo> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<ArchivoResponse> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(archivoService.obtenerPorId(id));
     }
 
     // Ejemplo: GET /api/archivos/por-mascota?mascotaId=1
     @GetMapping("/por-mascota")
-    public ResponseEntity<List<Archivo>> listarPorMascota(@RequestParam Long mascotaId) {
+    public ResponseEntity<List<ArchivoResponse>> listarPorMascota(@RequestParam Long mascotaId) {
         return ResponseEntity.ok(archivoService.listarPorMascota(mascotaId));
     }
 
     @PostMapping
-    public ResponseEntity<Archivo> crear(@RequestBody Archivo archivo) {
+    public ResponseEntity<ArchivoResponse> crear(@Valid @RequestBody ArchivoRequest archivo) {
         return ResponseEntity.status(HttpStatus.CREATED).body(archivoService.crear(archivo));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Archivo> actualizar(@PathVariable Long id, @RequestBody Archivo archivo) {
+    public ResponseEntity<ArchivoResponse> actualizar(@PathVariable Long id, @Valid @RequestBody ArchivoRequest archivo) {
         return ResponseEntity.ok(archivoService.actualizar(id, archivo));
     }
 

@@ -1,16 +1,17 @@
 package com.cesde.petmind.service;
 
 import java.util.List;
-import com.cesde.petmind.model.entity.Archivo;
+import com.cesde.petmind.dto.ArchivoRequest;
+import com.cesde.petmind.dto.ArchivoResponse;
 
 public interface ArchivoService {
    
-    List<Archivo> listar();
-    Archivo obtenerPorId(Long id);
-    Archivo crear(Archivo archivo);
-    Archivo actualizar(Long id, Archivo archivo);
+    List<ArchivoResponse> listar();
+    ArchivoResponse obtenerPorId(Long id);
+    ArchivoResponse crear(ArchivoRequest archivo);
+    ArchivoResponse actualizar(Long id, ArchivoRequest archivo);
     void eliminar(Long id);
 
-    List<Archivo> listarPorMascota(Long mascotaId);
+    List<ArchivoResponse> listarPorMascota(Long mascotaId);
     
 }
