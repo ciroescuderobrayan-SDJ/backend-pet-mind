@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.cesde.petmind.exceptions.RecursoDuplicadoException;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
+import com.cesde.petmind.dto.FavoritoRequest;
 import com.cesde.petmind.model.entity.Favorito;
 import com.cesde.petmind.model.entity.Mascota;
 import com.cesde.petmind.model.entity.Usuario;
@@ -43,11 +44,8 @@ class FavoritoServiceImplTest {
     @InjectMocks
     private FavoritoServiceImpl favoritoService;
 
-    private Favorito favoritoDeMascota(Long usuarioId, Long mascotaId) {
-        return Favorito.builder()
-                .usuario(Usuario.builder().id(usuarioId).build())
-                .mascota(Mascota.builder().id(mascotaId).build())
-                .build();
+    private FavoritoRequest favoritoDeMascota(Long usuarioId, Long mascotaId) {
+        return new FavoritoRequest(usuarioId, mascotaId, null, null);
     }
 
     @Test
@@ -64,5 +62,24 @@ class FavoritoServiceImplTest {
     void crearConUsuarioSinIdResponde400YNo500() {
         // Antes findById(null) lanzaba IllegalArgumentException y la API respondia 500
         assertThrows(ReglaDeNegocioException.class, () -> favoritoService.crear(favoritoDeMascota(null, 5L)));
+    }
+
+    @Test
+    void crearRechazaVariosDestinos() {
+        assertThrows(ReglaDeNegocioException.class, () -> favoritoService.crear(new FavoritoRequest(1L, 2L, 3L, null)));
+        verify(favoritoRepository, never()).save(any(Favorito.class));
+    }
+
+    @Test
+    void crearDevuelveIdsYNoLaEntidad() {
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(Usuario.builder().id(1L).build()));
+        when(mascotaRepository.findById(5L)).thenReturn(Optional.of(Mascota.builder().id(5L).build()));
+        when(favoritoRepository.save(any(Favorito.class))).thenAnswer(inv -> {
+            Favorito favorito = inv.getArgument(0); favorito.setId(7L); return favorito;
+        });
+        var respuesta = favoritoService.crear(favoritoDeMascota(1L, 5L));
+        org.junit.jupiter.api.Assertions.assertEquals(7L, respuesta.id());
+        org.junit.jupiter.api.Assertions.assertEquals(1L, respuesta.usuarioId());
+        org.junit.jupiter.api.Assertions.assertEquals(5L, respuesta.mascotaId());
     }
 }

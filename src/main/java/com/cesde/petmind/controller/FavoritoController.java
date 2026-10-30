@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.cesde.petmind.model.entity.Favorito;
+import com.cesde.petmind.dto.FavoritoRequest;
+import com.cesde.petmind.dto.FavoritoResponse;
 import com.cesde.petmind.service.FavoritoService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/favoritos")
@@ -24,23 +26,23 @@ public class FavoritoController {
     private final FavoritoService favoritoService;
 
     @GetMapping
-    public ResponseEntity<List<Favorito>> listar() {
+    public ResponseEntity<List<FavoritoResponse>> listar() {
         return ResponseEntity.ok(favoritoService.listar());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Favorito> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<FavoritoResponse> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(favoritoService.obtenerPorId(id));
     }
 
     // Ejemplo: GET /api/favoritos/por-usuario?usuarioId=1
     @GetMapping("/por-usuario")
-    public ResponseEntity<List<Favorito>> listarPorUsuario(@RequestParam Long usuarioId) {
+    public ResponseEntity<List<FavoritoResponse>> listarPorUsuario(@RequestParam Long usuarioId) {
         return ResponseEntity.ok(favoritoService.listarPorUsuario(usuarioId));
     }
 
     @PostMapping
-    public ResponseEntity<Favorito> crear(@RequestBody Favorito favorito) {
+    public ResponseEntity<FavoritoResponse> crear(@Valid @RequestBody FavoritoRequest favorito) {
         return ResponseEntity.status(HttpStatus.CREATED).body(favoritoService.crear(favorito));
     }
 

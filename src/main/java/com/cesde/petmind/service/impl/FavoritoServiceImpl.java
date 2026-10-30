@@ -7,6 +7,9 @@ package com.cesde.petmind.service.impl;
 import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.cesde.petmind.dto.FavoritoRequest;
+import com.cesde.petmind.dto.FavoritoResponse;
 import com.cesde.petmind.exceptions.RecursoDuplicadoException;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.CampanaDonacion;
@@ -22,6 +25,7 @@ import com.cesde.petmind.repository.UsuarioRepository;
 import com.cesde.petmind.service.FavoritoService;
 
 @Service
+@Transactional
 public class FavoritoServiceImpl implements FavoritoService {
     private final FavoritoRepository favoritoRepository;
     private final UsuarioRepository usuarioRepository;
@@ -30,19 +34,31 @@ public class FavoritoServiceImpl implements FavoritoService {
     private final FundacionRepository fundacionRepository;
 
     @Override
-    public List<Favorito> listar() {
-        return favoritoRepository.findByEstadoActivoTrue();
+    public List<FavoritoResponse> listar() {
+        return favoritoRepository.findByEstadoActivoTrue().stream().map(this::aResponse).toList();
     }
 
     @Override
-    public Favorito obtenerPorId(Long id) {
+    public FavoritoResponse obtenerPorId(Long id) {
         // Un favorito borrado logicamente se trata igual que uno que no existe
-        Favorito favorito = buscarActivo(favoritoRepository, id, "un favorito");
-        return favorito;
+        return aResponse(buscarFavorito(id));
     }
 
     @Override
-    public Favorito crear(Favorito favorito) {
+    public FavoritoResponse crear(FavoritoRequest request) {
+        Favorito favorito = new Favorito();
+        if (request.usuarioId() != null) {
+            Usuario usuario = new Usuario(); usuario.setId(request.usuarioId()); favorito.setUsuario(usuario);
+        }
+        if (request.mascotaId() != null) {
+            Mascota mascota = new Mascota(); mascota.setId(request.mascotaId()); favorito.setMascota(mascota);
+        }
+        if (request.campanaId() != null) {
+            CampanaDonacion campana = new CampanaDonacion(); campana.setId(request.campanaId()); favorito.setCampana(campana);
+        }
+        if (request.fundacionId() != null) {
+            Fundacion fundacion = new Fundacion(); fundacion.setId(request.fundacionId()); favorito.setFundacion(fundacion);
+        }
         validarUnSoloDestino(favorito);
         if (favorito.getUsuario() == null) {
             throw new ReglaDeNegocioException("El favorito debe indicar el usuario que lo guarda");
@@ -67,20 +83,20 @@ public class FavoritoServiceImpl implements FavoritoService {
             favorito.setFundacion(fundacion);
         }
         validarNoRepetido(favorito);
-        return favoritoRepository.save(favorito);
+        return aResponse(favoritoRepository.save(favorito));
     }
 
     @Override
     public void eliminar(Long id) {
-        Favorito favorito = obtenerPorId(id);
+        Favorito favorito = buscarFavorito(id);
         // Borrado logico: no se borra la fila, solo se desactiva
         favorito.setEstadoActivo(false);
         favoritoRepository.save(favorito);
     }
 
     @Override
-    public List<Favorito> listarPorUsuario(Long usuarioId) {
-        return favoritoRepository.findByUsuarioIdAndEstadoActivoTrue(usuarioId);
+    public List<FavoritoResponse> listarPorUsuario(Long usuarioId) {
+        return favoritoRepository.findByUsuarioIdAndEstadoActivoTrue(usuarioId).stream().map(this::aResponse).toList();
     }
 
     // Regla de negocio: el mismo usuario no puede guardar dos veces lo mismo.
@@ -115,6 +131,18 @@ public class FavoritoServiceImpl implements FavoritoService {
         if (destinos != 1) {
             throw new ReglaDeNegocioException("El favorito debe apuntar a una sola cosa: una mascota, una campana o una fundacion");
         }
+    }
+
+    private Favorito buscarFavorito(Long id) {
+        return buscarActivo(favoritoRepository, id, "un favorito");
+    }
+
+    private FavoritoResponse aResponse(Favorito favorito) {
+        return new FavoritoResponse(favorito.getId(), favorito.getUsuario() == null ? null : favorito.getUsuario().getId(),
+                favorito.getMascota() == null ? null : favorito.getMascota().getId(),
+                favorito.getCampana() == null ? null : favorito.getCampana().getId(),
+                favorito.getFundacion() == null ? null : favorito.getFundacion().getId(),
+                favorito.getEstadoActivo(), favorito.getFechaCreacion(), favorito.getFechaActualizacion());
     }
     public FavoritoServiceImpl(final FavoritoRepository favoritoRepository, final UsuarioRepository usuarioRepository, final MascotaRepository mascotaRepository, final CampanaDonacionRepository campanaDonacionRepository, final FundacionRepository fundacionRepository) {
         this.favoritoRepository = favoritoRepository;

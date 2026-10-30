@@ -1,15 +1,16 @@
 package com.cesde.petmind.service;
 
 import java.util.List;
-import com.cesde.petmind.model.entity.Favorito;
+import com.cesde.petmind.dto.FavoritoRequest;
+import com.cesde.petmind.dto.FavoritoResponse;
 
 public interface FavoritoService {
     
-     List<Favorito> listar();
-    Favorito obtenerPorId(Long id);
-    Favorito crear(Favorito favorito);
+    List<FavoritoResponse> listar();
+    FavoritoResponse obtenerPorId(Long id);
+    FavoritoResponse crear(FavoritoRequest favorito);
     void eliminar(Long id);
 
-    List<Favorito> listarPorUsuario(Long usuarioId);
+    List<FavoritoResponse> listarPorUsuario(Long usuarioId);
     
 }
