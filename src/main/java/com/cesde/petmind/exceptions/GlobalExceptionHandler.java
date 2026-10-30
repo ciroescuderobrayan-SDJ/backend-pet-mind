@@ -2,6 +2,7 @@ package com.cesde.petmind.exceptions;
 
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -27,6 +29,18 @@ public class GlobalExceptionHandler {
 
     // Codigo SQL estandar de "valor duplicado" (restriccion UNIQUE)
     private static final String SQL_VALOR_DUPLICADO = "23505";
+
+    // Mantiene la forma {"mensaje": "..."} y enumera todos los campos invalidos.
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> manejarValidacion(MethodArgumentNotValidException ex) {
+        String mensaje = ex.getBindingResult().getAllErrors().stream()
+                .map(error -> error instanceof org.springframework.validation.FieldError campo
+                        ? campo.getField() + ": " + error.getDefaultMessage()
+                        : error.getObjectName() + ": " + error.getDefaultMessage())
+                .sorted()
+                .collect(Collectors.joining("; "));
+        return responder(HttpStatus.BAD_REQUEST, mensaje.isEmpty() ? "La petición tiene datos inválidos" : mensaje);
+    }
 
     @ExceptionHandler(RecursoNoEncontradoException.class)
     public ResponseEntity<Map<String, String>> manejarNoEncontrado(RecursoNoEncontradoException ex) {

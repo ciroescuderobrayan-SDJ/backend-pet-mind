@@ -1,12 +1,13 @@
 package com.cesde.petmind.service;
 
 import java.util.List;
-import com.cesde.petmind.model.entity.Fundacion;
+import com.cesde.petmind.dto.FundacionRequest;
+import com.cesde.petmind.dto.FundacionResponse;
 
 public interface FundacionService {
-    List<Fundacion> listar();
-    Fundacion obtenerPorId(Long id);
-    Fundacion crear(Fundacion fundacion);
-    Fundacion actualizar(Long id, Fundacion fundacion);
+    List<FundacionResponse> listar();
+    FundacionResponse obtenerPorId(Long id);
+    FundacionResponse crear(FundacionRequest fundacion);
+    FundacionResponse actualizar(Long id, FundacionRequest fundacion);
     void eliminar(Long id);
 }
