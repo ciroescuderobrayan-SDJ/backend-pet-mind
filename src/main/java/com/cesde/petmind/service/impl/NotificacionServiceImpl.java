@@ -7,7 +7,9 @@ package com.cesde.petmind.service.impl;
 import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
 import java.util.List;
 import org.springframework.stereotype.Service;
-import com.cesde.petmind.exceptions.ReglaDeNegocioException;
+import org.springframework.transaction.annotation.Transactional;
+import com.cesde.petmind.dto.NotificacionRequest;
+import com.cesde.petmind.dto.NotificacionResponse;
 import com.cesde.petmind.model.entity.Notificacion;
 import com.cesde.petmind.model.entity.Usuario;
 import com.cesde.petmind.repository.NotificacionRepository;
@@ -15,64 +17,75 @@ import com.cesde.petmind.repository.UsuarioRepository;
 import com.cesde.petmind.service.NotificacionService;
 
 @Service
+@Transactional
 public class NotificacionServiceImpl implements NotificacionService {
     private final NotificacionRepository notificacionRepository;
     private final UsuarioRepository usuarioRepository;
 
     @Override
-    public List<Notificacion> listar() {
-        return notificacionRepository.findByEstadoActivoTrue();
+    public List<NotificacionResponse> listar() {
+        return notificacionRepository.findByEstadoActivoTrue().stream().map(this::aResponse).toList();
     }
 
     @Override
-    public Notificacion obtenerPorId(Long id) {
+    public NotificacionResponse obtenerPorId(Long id) {
         // Una notificacion borrada logicamente se trata igual que una que no existe
-        Notificacion notificacion = buscarActivo(notificacionRepository, id, "una notificacion");
-        return notificacion;
+        return aResponse(buscarNotificacion(id));
     }
 
     @Override
-    public Notificacion crear(Notificacion notificacion) {
-        if (notificacion.getUsuario() == null) {
-            throw new ReglaDeNegocioException("La notificacion debe indicar el usuario que la recibe");
-        }
-        // En el JSON solo llega el id; aca se trae el usuario completo de la base
-        Long usuarioId = notificacion.getUsuario().getId();
-        Usuario usuario = buscarActivo(usuarioRepository, usuarioId, "un usuario");
+    public NotificacionResponse crear(NotificacionRequest request) {
+        Usuario usuario = buscarActivo(usuarioRepository, request.usuarioId(), "un usuario");
+        Notificacion notificacion = new Notificacion();
         notificacion.setUsuario(usuario);
-        return notificacionRepository.save(notificacion);
+        aplicarDatos(notificacion, request);
+        return aResponse(notificacionRepository.save(notificacion));
     }
 
     @Override
-    public Notificacion actualizar(Long id, Notificacion notificacion) {
-        Notificacion existente = obtenerPorId(id);
+    public NotificacionResponse actualizar(Long id, NotificacionRequest request) {
+        Notificacion existente = buscarNotificacion(id);
         // El usuario que la recibe no cambia
-        existente.setTipo(notificacion.getTipo());
-        existente.setTitulo(notificacion.getTitulo());
-        existente.setMensaje(notificacion.getMensaje());
-        existente.setUrlDestino(notificacion.getUrlDestino());
-        existente.setLeida(notificacion.getLeida());
-        return notificacionRepository.save(existente);
+        aplicarDatos(existente, request);
+        return aResponse(notificacionRepository.save(existente));
     }
 
     @Override
     public void eliminar(Long id) {
-        Notificacion notificacion = obtenerPorId(id);
+        Notificacion notificacion = buscarNotificacion(id);
         // Borrado logico: no se borra la fila, solo se desactiva
         notificacion.setEstadoActivo(false);
         notificacionRepository.save(notificacion);
     }
 
     @Override
-    public List<Notificacion> listarNoLeidasPorUsuario(Long usuarioId) {
-        return notificacionRepository.findByUsuarioIdAndLeidaFalseAndEstadoActivoTrue(usuarioId);
+    public List<NotificacionResponse> listarNoLeidasPorUsuario(Long usuarioId) {
+        return notificacionRepository.findByUsuarioIdAndLeidaFalseAndEstadoActivoTrue(usuarioId).stream().map(this::aResponse).toList();
     }
 
     @Override
-    public Notificacion marcarComoLeida(Long id) {
-        Notificacion notificacion = obtenerPorId(id);
+    public NotificacionResponse marcarComoLeida(Long id) {
+        Notificacion notificacion = buscarNotificacion(id);
         notificacion.setLeida(true);
-        return notificacionRepository.save(notificacion);
+        return aResponse(notificacionRepository.save(notificacion));
+    }
+
+    private Notificacion buscarNotificacion(Long id) {
+        return buscarActivo(notificacionRepository, id, "una notificacion");
+    }
+
+    private void aplicarDatos(Notificacion notificacion, NotificacionRequest request) {
+        notificacion.setTipo(request.tipo());
+        notificacion.setTitulo(request.titulo());
+        notificacion.setMensaje(request.mensaje());
+        notificacion.setUrlDestino(request.urlDestino());
+        notificacion.setLeida(request.leida());
+    }
+
+    private NotificacionResponse aResponse(Notificacion notificacion) {
+        return new NotificacionResponse(notificacion.getId(), notificacion.getUsuario() == null ? null : notificacion.getUsuario().getId(),
+                notificacion.getTipo(), notificacion.getTitulo(), notificacion.getMensaje(), notificacion.getUrlDestino(),
+                notificacion.getLeida(), notificacion.getEstadoActivo(), notificacion.getFechaCreacion(), notificacion.getFechaActualizacion());
     }
     public NotificacionServiceImpl(final NotificacionRepository notificacionRepository, final UsuarioRepository usuarioRepository) {
         this.notificacionRepository = notificacionRepository;

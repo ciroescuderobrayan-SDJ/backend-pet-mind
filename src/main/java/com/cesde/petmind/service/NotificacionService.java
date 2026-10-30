@@ -1,18 +1,19 @@
 package com.cesde.petmind.service;
 
 import java.util.List;
-import com.cesde.petmind.model.entity.Notificacion;
+import com.cesde.petmind.dto.NotificacionRequest;
+import com.cesde.petmind.dto.NotificacionResponse;
 
 public interface NotificacionService {
     
-    List<Notificacion> listar();
-    Notificacion obtenerPorId(Long id);
-    Notificacion crear(Notificacion notificacion);
-    Notificacion actualizar(Long id, Notificacion notificacion);
+    List<NotificacionResponse> listar();
+    NotificacionResponse obtenerPorId(Long id);
+    NotificacionResponse crear(NotificacionRequest notificacion);
+    NotificacionResponse actualizar(Long id, NotificacionRequest notificacion);
     void eliminar(Long id);
 
-    List<Notificacion> listarNoLeidasPorUsuario(Long usuarioId);
+    List<NotificacionResponse> listarNoLeidasPorUsuario(Long usuarioId);
 
-    Notificacion marcarComoLeida(Long id);
+    NotificacionResponse marcarComoLeida(Long id);
     
 }

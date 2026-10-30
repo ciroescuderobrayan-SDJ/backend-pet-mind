@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.cesde.petmind.model.entity.Notificacion;
+import com.cesde.petmind.dto.NotificacionRequest;
+import com.cesde.petmind.dto.NotificacionResponse;
 import com.cesde.petmind.service.NotificacionService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/notificaciones")
@@ -26,33 +28,33 @@ public class NotificacionController {
     private final NotificacionService notificacionService;
 
     @GetMapping
-    public ResponseEntity<List<Notificacion>> listar() {
+    public ResponseEntity<List<NotificacionResponse>> listar() {
         return ResponseEntity.ok(notificacionService.listar());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Notificacion> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<NotificacionResponse> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(notificacionService.obtenerPorId(id));
     }
 
     // Ejemplo: GET /api/notificaciones/no-leidas?usuarioId=1
     @GetMapping("/no-leidas")
-    public ResponseEntity<List<Notificacion>> listarNoLeidasPorUsuario(@RequestParam Long usuarioId) {
+    public ResponseEntity<List<NotificacionResponse>> listarNoLeidasPorUsuario(@RequestParam Long usuarioId) {
         return ResponseEntity.ok(notificacionService.listarNoLeidasPorUsuario(usuarioId));
     }
 
     @PostMapping
-    public ResponseEntity<Notificacion> crear(@RequestBody Notificacion notificacion) {
+    public ResponseEntity<NotificacionResponse> crear(@Valid @RequestBody NotificacionRequest notificacion) {
         return ResponseEntity.status(HttpStatus.CREATED).body(notificacionService.crear(notificacion));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Notificacion> actualizar(@PathVariable Long id, @RequestBody Notificacion notificacion) {
+    public ResponseEntity<NotificacionResponse> actualizar(@PathVariable Long id, @Valid @RequestBody NotificacionRequest notificacion) {
         return ResponseEntity.ok(notificacionService.actualizar(id, notificacion));
     }
 
     @PatchMapping("/{id}/leida")
-    public ResponseEntity<Notificacion> marcarComoLeida(@PathVariable Long id) {
+    public ResponseEntity<NotificacionResponse> marcarComoLeida(@PathVariable Long id) {
         return ResponseEntity.ok(notificacionService.marcarComoLeida(id));
     }
 
