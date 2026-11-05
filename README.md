@@ -61,6 +61,12 @@ Controller → Service → Repository → Entity → PostgreSQL
 - **Entity:** representa las tablas y relaciones del modelo.
 - **BaseEntity:** centraliza `id`, fechas de creación y actualización, y `estadoActivo`.
 
+### Analítica
+
+`GET /api/analitica` consulta la API Python configurada en `ANALITICA_API_URL`
+en el archivo `.env` y devuelve su JSON al frontend. Esta integración es de
+solo lectura: la respuesta se procesa en memoria y no se guarda en PostgreSQL.
+
 ## Modelo de datos v3
 
 ![Diagrama de base de datos PetMind v3](docs/diagrama-db-petmind.png)
