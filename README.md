@@ -1,4 +1,6 @@
 # PetMind Backend
+https://backend-pet-mind.onrender.com
+esta es la URL DE RENDER
 
 Backend de PetMind, una plataforma para conectar personas, mascotas y fundaciones mediante procesos de adopción, campañas de donación, reportes de animales y contenido informativo.
 
@@ -58,6 +60,12 @@ Controller → Service → Repository → Entity → PostgreSQL
 - **Repository:** accede a los datos mediante `JpaRepository`.
 - **Entity:** representa las tablas y relaciones del modelo.
 - **BaseEntity:** centraliza `id`, fechas de creación y actualización, y `estadoActivo`.
+
+### Analítica
+
+`GET /api/analitica` consulta la API Python configurada en `ANALITICA_API_URL`
+en el archivo `.env` y devuelve su JSON al frontend. Esta integración es de
+solo lectura: la respuesta se procesa en memoria y no se guarda en PostgreSQL.
 
 ## Modelo de datos v3
 
