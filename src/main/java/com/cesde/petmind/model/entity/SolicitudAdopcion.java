@@ -62,6 +62,12 @@ public class SolicitudAdopcion extends BaseEntity {
     private LocalDateTime fechaVisitaHogar;
     @Column(name = "fecha_decision")
     private LocalDateTime fechaDecision;
+    // Lo que la fundacion le dice a la persona: documentos que pide o motivo del rechazo
+    @Column(name = "mensaje_fundacion", length = 1000)
+    private String mensajeFundacion;
+    // Respuesta de la persona cuando la fundacion le pide documentos
+    @Column(name = "respuesta_adoptante", length = 2000)
+    private String respuestaAdoptante;
     public static abstract class SolicitudAdopcionBuilder<C extends SolicitudAdopcion, B extends SolicitudAdopcion.SolicitudAdopcionBuilder<C, B>> extends BaseEntity.BaseEntityBuilder<C, B> {
         private Usuario usuario;
         private Mascota mascota;
@@ -286,6 +292,18 @@ public class SolicitudAdopcion extends BaseEntity {
     }
     public void setFechaDecision(final LocalDateTime fechaDecision) {
         this.fechaDecision = fechaDecision;
+    }
+    public String getMensajeFundacion() {
+        return this.mensajeFundacion;
+    }
+    public void setMensajeFundacion(final String mensajeFundacion) {
+        this.mensajeFundacion = mensajeFundacion;
+    }
+    public String getRespuestaAdoptante() {
+        return this.respuestaAdoptante;
+    }
+    public void setRespuestaAdoptante(final String respuestaAdoptante) {
+        this.respuestaAdoptante = respuestaAdoptante;
     }
     public SolicitudAdopcion() {
     }

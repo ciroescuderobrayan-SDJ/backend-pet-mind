@@ -57,6 +57,16 @@ public class GlobalExceptionHandler {
         return responder(HttpStatus.CONFLICT, ex.getMessage());
     }
 
+    @ExceptionHandler(CredencialesInvalidasException.class)
+    public ResponseEntity<Map<String, String>> manejarCredencialesInvalidas(CredencialesInvalidasException ex) {
+        return responder(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
+    @ExceptionHandler(AccesoDenegadoException.class)
+    public ResponseEntity<Map<String, String>> manejarAccesoDenegado(AccesoDenegadoException ex) {
+        return responder(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
     @ExceptionHandler(AnaliticaException.class)
     public ResponseEntity<Map<String, String>> manejarAnalitica(AnaliticaException ex) {
         log.error("Error al consultar la API de analitica", ex);

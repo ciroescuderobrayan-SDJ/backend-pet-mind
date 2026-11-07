@@ -1,6 +1,7 @@
 package com.cesde.petmind.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,4 +15,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     // Recorre el embebido contacto -> emailContacto. Lo usa la regla de correo unico.
     // IgnoreCase: "Ana@correo.com" y "ana@correo.com" son el mismo correo.
     boolean existsByContactoEmailContactoIgnoreCase(String emailContacto);
+
+    // Inicio de sesion: solo cuentas activas
+    Optional<Usuario> findFirstByContactoEmailContactoIgnoreCaseAndEstadoActivoTrue(String emailContacto);
 }

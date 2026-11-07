@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.cesde.petmind.dto.CambioEstadoSolicitudRequest;
+import com.cesde.petmind.dto.RespuestaSolicitudRequest;
 import com.cesde.petmind.dto.SolicitudAdopcionRequest;
 import com.cesde.petmind.dto.SolicitudAdopcionResponse;
 import com.cesde.petmind.model.enums.EstadoSolicitud;
@@ -56,15 +59,33 @@ public class SolicitudAdopcionController {
     }
 
     @GetMapping("/por-fundacion")
-    @Operation(summary = "Listar solicitudes por fundación y estado", description = "Filtra solicitudes por fundación y estado de la adopción.")
+    @Operation(summary = "Listar solicitudes por fundación y estado", description = "Filtra solicitudes por fundación. El estado es opcional: sin él devuelve todas las solicitudes de la fundación.")
     public ResponseEntity<List<SolicitudAdopcionResponse>>
             listarPorFundacionYEstado(
                     @RequestParam Long fundacionId,
-                    @RequestParam EstadoSolicitud estado) {
+                    @RequestParam(required = false) EstadoSolicitud estado) {
 
-        return ResponseEntity.ok(
-                solicitudAdopcionService
-                        .listarPorFundacionYEstado(fundacionId, estado));
+        return ResponseEntity.ok(estado == null
+                ? solicitudAdopcionService.listarPorFundacion(fundacionId)
+                : solicitudAdopcionService.listarPorFundacionYEstado(fundacionId, estado));
+    }
+
+    @PatchMapping("/{id}/estado")
+    @Operation(summary = "Cambiar el estado de una solicitud", description = "La fundación pasa la solicitud a revisión, pide documentos, la aprueba o la rechaza. Pedir documentos y rechazar exigen un mensaje. Aprobar marca la mascota como adoptada y cierra las demás solicitudes abiertas de esa mascota.")
+    public ResponseEntity<SolicitudAdopcionResponse> cambiarEstado(
+            @PathVariable Long id,
+            @Valid @RequestBody CambioEstadoSolicitudRequest request) {
+
+        return ResponseEntity.ok(solicitudAdopcionService.cambiarEstado(id, request));
+    }
+
+    @PatchMapping("/{id}/respuesta")
+    @Operation(summary = "Responder a la fundación", description = "La persona envía lo que la fundación le pidió. Solo se permite cuando la solicitud está en DOCUMENTOS_PENDIENTES; después vuelve a EN_REVISION.")
+    public ResponseEntity<SolicitudAdopcionResponse> responder(
+            @PathVariable Long id,
+            @Valid @RequestBody RespuestaSolicitudRequest request) {
+
+        return ResponseEntity.ok(solicitudAdopcionService.responder(id, request));
     }
 
     @PostMapping

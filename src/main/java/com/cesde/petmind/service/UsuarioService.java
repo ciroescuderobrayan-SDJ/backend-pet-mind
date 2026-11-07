@@ -2,6 +2,7 @@ package com.cesde.petmind.service;
 
 import java.util.List;
 
+import com.cesde.petmind.dto.LoginRequest;
 import com.cesde.petmind.dto.UsuarioRequest;
 import com.cesde.petmind.dto.UsuarioResponse;
 
@@ -11,4 +12,5 @@ public interface UsuarioService {
     UsuarioResponse crear(UsuarioRequest usuario);
     UsuarioResponse actualizar(Long id, UsuarioRequest usuario);
     void eliminar(Long id);
+    UsuarioResponse iniciarSesion(LoginRequest request);
 }
