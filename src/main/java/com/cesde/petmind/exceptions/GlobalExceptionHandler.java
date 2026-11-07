@@ -57,6 +57,12 @@ public class GlobalExceptionHandler {
         return responder(HttpStatus.CONFLICT, ex.getMessage());
     }
 
+    @ExceptionHandler(AnaliticaException.class)
+    public ResponseEntity<Map<String, String>> manejarAnalitica(AnaliticaException ex) {
+        log.error("Error al consultar la API de analitica", ex);
+        return responder(HttpStatus.BAD_GATEWAY, ex.getMessage());
+    }
+
     // JSON mal escrito o con un valor que no existe en un enum (p. ej. "metodoPago": "TARJETA")
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> manejarJsonInvalido(HttpMessageNotReadableException ex) {
