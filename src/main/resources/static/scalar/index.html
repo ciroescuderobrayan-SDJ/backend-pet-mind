@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PetMind API - Scalar</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #0f172a;
+      }
+
+      #app {
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+    <script>
+      Scalar.createApiReference('#app', {
+        url: '/v3/api-docs',
+        title: 'PetMind API',
+        theme: 'purple',
+        layout: 'modern',
+        hideModels: false,
+        hideDownloadButton: false,
+        defaultHttpClient: {
+          targetKey: 'javascript',
+          clientKey: 'fetch'
+        }
+      });
+    </script>
+  </body>
+</html>

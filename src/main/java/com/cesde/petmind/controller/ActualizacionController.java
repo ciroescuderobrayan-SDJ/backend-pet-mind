@@ -14,10 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cesde.petmind.dto.ActualizacionRequest;
 import com.cesde.petmind.dto.ActualizacionResponse;
 import com.cesde.petmind.service.ActualizacionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/actualizaciones")
+@Tag(name = "Actualizaciones", description = "Seguimiento de actualizaciones de animales o perfiles")
 public class ActualizacionController {
     private final ActualizacionService actualizacionService;
 
@@ -26,26 +29,31 @@ public class ActualizacionController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar actualizaciones", description = "Obtiene todas las actualizaciones registradas en la plataforma.")
     public ResponseEntity<List<ActualizacionResponse>> listar() {
         return ResponseEntity.ok(actualizacionService.listar());
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obtener actualización por ID", description = "Consulta una actualización por su identificador único.")
     public ResponseEntity<ActualizacionResponse> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(actualizacionService.obtenerPorId(id));
     }
 
     @PostMapping
+    @Operation(summary = "Crear actualización", description = "Registra una nueva actualización del contenido asociado.")
     public ResponseEntity<ActualizacionResponse> crear(@Valid @RequestBody ActualizacionRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(actualizacionService.crear(request));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Actualizar actualización", description = "Actualiza una actualización existente.")
     public ResponseEntity<ActualizacionResponse> actualizar(@PathVariable Long id, @Valid @RequestBody ActualizacionRequest request) {
         return ResponseEntity.ok(actualizacionService.actualizar(id, request));
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar actualización", description = "Elimina una actualización por su ID.")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         actualizacionService.eliminar(id);
         return ResponseEntity.noContent().build();

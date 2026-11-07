@@ -20,20 +20,25 @@ import com.cesde.petmind.dto.SolicitudAdopcionRequest;
 import com.cesde.petmind.dto.SolicitudAdopcionResponse;
 import com.cesde.petmind.model.enums.EstadoSolicitud;
 import com.cesde.petmind.service.SolicitudAdopcionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/solicitudes-adopcion")
+@Tag(name = "Solicitudes de adopción", description = "Gestión de solicitudes y aprobaciones de adopción")
 public class SolicitudAdopcionController {
 
     private final SolicitudAdopcionService solicitudAdopcionService;
 
     @GetMapping
+    @Operation(summary = "Listar solicitudes", description = "Obtiene todas las solicitudes de adopción registradas.")
     public ResponseEntity<List<SolicitudAdopcionResponse>> listar() {
         return ResponseEntity.ok(solicitudAdopcionService.listar());
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obtener solicitud por ID", description = "Consulta una solicitud de adopción por su identificador único.")
     public ResponseEntity<SolicitudAdopcionResponse> obtenerPorId(
             @PathVariable Long id) {
 
@@ -42,6 +47,7 @@ public class SolicitudAdopcionController {
     }
 
     @GetMapping("/por-usuario")
+    @Operation(summary = "Listar solicitudes por usuario", description = "Devuelve las solicitudes de adopción asociadas a un usuario concreto.")
     public ResponseEntity<List<SolicitudAdopcionResponse>> listarPorUsuario(
             @RequestParam Long usuarioId) {
 
@@ -50,6 +56,7 @@ public class SolicitudAdopcionController {
     }
 
     @GetMapping("/por-fundacion")
+    @Operation(summary = "Listar solicitudes por fundación y estado", description = "Filtra solicitudes por fundación y estado de la adopción.")
     public ResponseEntity<List<SolicitudAdopcionResponse>>
             listarPorFundacionYEstado(
                     @RequestParam Long fundacionId,
@@ -61,6 +68,7 @@ public class SolicitudAdopcionController {
     }
 
     @PostMapping
+    @Operation(summary = "Crear solicitud", description = "Registra una nueva solicitud de adopción para una mascota.")
     public ResponseEntity<SolicitudAdopcionResponse> crear(
             @Valid @RequestBody SolicitudAdopcionRequest request) {
 
@@ -69,6 +77,7 @@ public class SolicitudAdopcionController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Actualizar solicitud", description = "Actualiza una solicitud de adopción existente.")
     public ResponseEntity<SolicitudAdopcionResponse> actualizar(
             @PathVariable Long id,
             @Valid @RequestBody SolicitudAdopcionRequest request) {
@@ -78,6 +87,7 @@ public class SolicitudAdopcionController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar solicitud", description = "Elimina una solicitud de adopción por su ID.")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         solicitudAdopcionService.eliminar(id);
         return ResponseEntity.noContent().build();

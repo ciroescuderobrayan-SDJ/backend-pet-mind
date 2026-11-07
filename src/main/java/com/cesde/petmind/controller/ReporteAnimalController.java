@@ -16,31 +16,38 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cesde.petmind.dto.ReporteAnimalRequest;
 import com.cesde.petmind.dto.ReporteAnimalResponse;
 import com.cesde.petmind.service.ReporteAnimalService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/reportes-animales")
+@Tag(name = "Reportes de animales", description = "Reporte y seguimiento de animales en la plataforma")
 public class ReporteAnimalController {
     private final ReporteAnimalService reporteAnimalService;
 
     @GetMapping
+    @Operation(summary = "Listar reportes de animales", description = "Obtiene todos los reportes registrados sobre animales.")
     public ResponseEntity<List<ReporteAnimalResponse>> listar() {
         return ResponseEntity.ok(reporteAnimalService.listar());
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obtener reporte de animal por ID", description = "Consulta un reporte por su identificador único.")
     public ResponseEntity<ReporteAnimalResponse> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(reporteAnimalService.obtenerPorId(id));
     }
 
     @PostMapping
+    @Operation(summary = "Crear reporte de animal", description = "Registra un nuevo reporte relacionado con un animal.")
     public ResponseEntity<ReporteAnimalResponse> crear(
             @Valid @RequestBody ReporteAnimalRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reporteAnimalService.crear(request));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Actualizar reporte de animal", description = "Actualiza un reporte de animal existente.")
     public ResponseEntity<ReporteAnimalResponse> actualizar(
             @PathVariable Long id,
             @Valid @RequestBody ReporteAnimalRequest request) {
@@ -48,6 +55,7 @@ public class ReporteAnimalController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar reporte de animal", description = "Elimina un reporte de animal por su ID.")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         reporteAnimalService.eliminar(id);
         return ResponseEntity.noContent().build();
