@@ -121,6 +121,9 @@ Las reglas de negocio se implementan en la capa de servicios. Algunos ejemplos s
 - Un favorito debe apuntar a una sola mascota, campaña o fundación, y el mismo usuario no puede guardarlo dos veces.
 - Un archivo debe pertenecer a un único recurso.
 - Una mascota debe estar disponible antes de recibir una solicitud.
+- Solo las cuentas `ADOPTANTE` envían solicitudes, y cada persona tiene como máximo una solicitud abierta por mascota.
+- Solo el representante de la fundación que publicó la mascota (o un `ADMIN`) cambia el estado de una solicitud. Pedir documentos (`DOCUMENTOS_PENDIENTES`) y rechazar exigen un mensaje para la persona. Aprobar deja la mascota `ADOPTADO` y rechaza las demás solicitudes abiertas de esa mascota. Una solicitud aprobada, rechazada o cancelada ya no cambia.
+- Las contraseñas se guardan cifradas con BCrypt. Las cuentas creadas antes en texto plano se cifran la primera vez que inician sesión.
 - Una campaña debe tener una fundación activa y una meta de recaudo válida.
 - Una donación debe tener un monto mayor que cero y un método de pago válido.
 
@@ -139,6 +142,8 @@ Todas las respuestas de error tienen la misma forma, sin detalles internos del s
 | Código | Cuándo |
 |---|---|
 | 400 | Regla de negocio, JSON mal escrito, valor de enum inexistente, parámetro faltante o campo obligatorio vacío |
+| 401 | Correo o contraseña incorrectos al iniciar sesión |
+| 403 | El usuario no puede hacer esa acción (decidir una solicitud de otra fundación, responder una solicitud ajena) |
 | 404 | El registro no existe o tiene borrado lógico |
 | 409 | Registro duplicado (correo, favorito, valor único) |
 | 500 | Error inesperado; el detalle queda solo en el log del servidor |
@@ -168,6 +173,12 @@ JpaRepository<Entidad, Long>
 | NotificacionRepository | `findByUsuarioIdAndLeidaFalseAndEstadoActivoTrue(...)` | Notificaciones sin leer. |
 
 ## Endpoints disponibles
+
+### Autenticación
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | `/api/auth/login` | Recibe `{ correo, contrasena }` y devuelve el usuario. Responde 401 si no coinciden. Todavía no emite tokens. |
 
 ### Usuarios
 
@@ -209,9 +220,11 @@ JpaRepository<Entidad, Long>
 | GET | `/api/solicitudes-adopcion` | Lista solicitudes activas. |
 | GET | `/api/solicitudes-adopcion/{id}` | Consulta una solicitud. |
 | GET | `/api/solicitudes-adopcion/por-usuario?usuarioId=1` | Solicitudes de un usuario. |
-| GET | `/api/solicitudes-adopcion/por-fundacion?fundacionId=1&estado=PENDIENTE` | Solicitudes por fundación y estado. |
-| POST | `/api/solicitudes-adopcion` | Crea una solicitud. |
-| PUT | `/api/solicitudes-adopcion/{id}` | Actualiza una solicitud. |
+| GET | `/api/solicitudes-adopcion/por-fundacion?fundacionId=1&estado=PENDIENTE` | Solicitudes de una fundación. `estado` es opcional: sin él trae todas. |
+| POST | `/api/solicitudes-adopcion` | Crea una solicitud (queda `PENDIENTE`). |
+| PUT | `/api/solicitudes-adopcion/{id}` | Actualiza usuario, mascota y datos del hogar. |
+| PATCH | `/api/solicitudes-adopcion/{id}/estado` | La fundación decide: `{ usuarioId, estado, mensaje }` con `EN_REVISION`, `ENTREVISTA`, `VISITA_HOGAR`, `DOCUMENTOS_PENDIENTES`, `APROBADA` o `RECHAZADA`. |
+| PATCH | `/api/solicitudes-adopcion/{id}/respuesta` | La persona responde un pedido de documentos: `{ usuarioId, respuesta }`. La solicitud vuelve a `EN_REVISION`. |
 | DELETE | `/api/solicitudes-adopcion/{id}` | Realiza borrado lógico. |
 
 ### Campañas de donación

@@ -8,12 +8,16 @@ import static com.cesde.petmind.service.support.BuscadorEntidades.buscarActivo;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.cesde.petmind.dto.ContactoDto;
 import com.cesde.petmind.dto.DireccionDto;
+import com.cesde.petmind.dto.LoginRequest;
 import com.cesde.petmind.dto.UsuarioRequest;
 import com.cesde.petmind.dto.UsuarioResponse;
+import com.cesde.petmind.exceptions.CredencialesInvalidasException;
 import com.cesde.petmind.exceptions.RecursoDuplicadoException;
 import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Fundacion;
@@ -34,6 +38,10 @@ public class UsuarioServiceImpl implements UsuarioService {
     private static final Pattern MAYUSCULA = Pattern.compile("[A-ZÁÉÍÓÚÜÑ]");
     // Caracter especial: cualquier cosa que no sea letra, numero o espacio (!, @, #, $, ...)
     private static final Pattern CARACTER_ESPECIAL = Pattern.compile("[^\\p{L}\\p{N}\\s]");
+    // Las contrasenas se guardan cifradas con BCrypt. Las cuentas creadas antes quedaron en texto plano:
+    // se aceptan una vez y se cifran en ese mismo inicio de sesion.
+    private static final PasswordEncoder CIFRADOR = new BCryptPasswordEncoder();
+    private static final String CREDENCIALES_INVALIDAS = "Correo o contraseña incorrectos";
 
     @Override
     @Transactional(readOnly = true)
@@ -57,7 +65,37 @@ public class UsuarioServiceImpl implements UsuarioService {
         validarRolPermitido(usuario);
         validarCorreoUnico(usuario);
         validarFundacionDelRepresentante(usuario);
+        usuario.setContrasena(CIFRADOR.encode(usuario.getContrasena()));
         return aResponse(usuarioRepository.save(usuario));
+    }
+
+    @Override
+    @Transactional
+    public UsuarioResponse iniciarSesion(LoginRequest request) {
+        String correo = request.correo().trim().toLowerCase(Locale.ROOT);
+        Usuario usuario = usuarioRepository.findFirstByContactoEmailContactoIgnoreCaseAndEstadoActivoTrue(correo)
+                .orElseThrow(() -> new CredencialesInvalidasException(CREDENCIALES_INVALIDAS));
+        String guardada = usuario.getContrasena();
+        if (guardada == null) {
+            throw new CredencialesInvalidasException(CREDENCIALES_INVALIDAS);
+        }
+        if (estaCifrada(guardada)) {
+            if (!CIFRADOR.matches(request.contrasena(), guardada)) {
+                throw new CredencialesInvalidasException(CREDENCIALES_INVALIDAS);
+            }
+            return aResponse(usuario);
+        }
+        // Cuenta antigua con la contrasena en texto plano: se compara y se cifra de una vez
+        if (!guardada.equals(request.contrasena())) {
+            throw new CredencialesInvalidasException(CREDENCIALES_INVALIDAS);
+        }
+        usuario.setContrasena(CIFRADOR.encode(request.contrasena()));
+        return aResponse(usuarioRepository.save(usuario));
+    }
+
+    // Un hash BCrypt empieza por $2a$, $2b$ o $2y$
+    private static boolean estaCifrada(String contrasena) {
+        return contrasena.matches("^\\$2[aby]\\$\\d{2}\\$.{53}$");
     }
 
     @Override
